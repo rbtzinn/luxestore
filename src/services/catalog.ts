@@ -5,6 +5,7 @@ import { normalizeLanguage } from '@/lib/locale';
 
 const API_BASE_URL = (import.meta.env.VITE_PRODUCTS_API_URL || 'https://dummyjson.com').replace(/\/$/, '');
 const PRODUCTS_LIMIT = 194;
+type CatalogPayload = { categories: Category[]; products: Product[] };
 
 type DummyProduct = {
   id: number;
@@ -38,6 +39,8 @@ type DummyCategory =
       name?: string;
       url?: string;
     };
+
+let catalogPayloadPromise: Promise<CatalogPayload> | null = null;
 
 function slugify(value: string) {
   return value
@@ -139,11 +142,32 @@ async function fetchCatalogPayload() {
   return { categories, products };
 }
 
+function getCatalogPayload() {
+  if (!catalogPayloadPromise) {
+    catalogPayloadPromise = fetchCatalogPayload().catch((error) => {
+      catalogPayloadPromise = null;
+      throw error;
+    });
+  }
+
+  return catalogPayloadPromise;
+}
+
+async function localizeProductsWithCategories(products: Product[], categories: Category[], language: string) {
+  const localizedCategories = await localizeCategories(categories, language);
+  const localizedProducts = await localizeProducts(products, language);
+
+  return localizedProducts.map((product) => ({
+    ...product,
+    category: localizedCategories.find((item) => item.id === product.category_id) || product.category,
+  }));
+}
+
 export async function listCategories(language = 'pt-BR'): Promise<Category[]> {
   const targetLanguage = normalizeLanguage(language);
 
   try {
-    const { categories } = await fetchCatalogPayload();
+    const { categories } = await getCatalogPayload();
     return localizeCategories(categories, targetLanguage);
   } catch {
     return localizeCategories(mockCategories, targetLanguage);
@@ -154,21 +178,10 @@ export async function listProducts(language = 'pt-BR'): Promise<Product[]> {
   const targetLanguage = normalizeLanguage(language);
 
   try {
-    const { categories, products } = await fetchCatalogPayload();
-    const localizedCategories = await localizeCategories(categories, targetLanguage);
-    const productsWithCategories = products.map((product) => ({
-      ...product,
-      category: localizedCategories.find((item) => item.id === product.category_id),
-    }));
-
-    return localizeProducts(productsWithCategories, targetLanguage);
+    const { categories, products } = await getCatalogPayload();
+    return localizeProductsWithCategories(products, categories, targetLanguage);
   } catch {
-    const localizedCategories = await localizeCategories(mockCategories, targetLanguage);
-    const localizedProducts = await localizeProducts(mockProducts, targetLanguage);
-    return localizedProducts.map((product) => ({
-      ...product,
-      category: localizedCategories.find((item) => item.id === product.category_id) || product.category,
-    }));
+    return localizeProductsWithCategories(mockProducts, mockCategories, targetLanguage);
   }
 }
 

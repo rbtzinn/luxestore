@@ -3,44 +3,55 @@ import { useTranslation } from 'react-i18next';
 import { getProductBySlug, listCategories, listProducts, listReviews } from '@/services/catalog';
 import { normalizeLanguage } from '@/lib/locale';
 
-export function useProducts() {
+function useCatalogLanguage() {
   const { i18n } = useTranslation();
-  const language = normalizeLanguage(i18n.resolvedLanguage || i18n.language);
+  return normalizeLanguage(i18n.resolvedLanguage || i18n.language);
+}
+
+function useCatalogQuery<TData>({
+  key,
+  queryFn,
+  enabled = true,
+}: {
+  key: readonly unknown[];
+  queryFn: (language: string) => Promise<TData>;
+  enabled?: boolean;
+}) {
+  const language = useCatalogLanguage();
 
   return useQuery({
-    queryKey: ['catalog', 'products', language],
-    queryFn: () => listProducts(language),
+    queryKey: ['catalog', ...key, language],
+    queryFn: () => queryFn(language),
+    enabled,
+  });
+}
+
+export function useProducts() {
+  return useCatalogQuery({
+    key: ['products'],
+    queryFn: listProducts,
   });
 }
 
 export function useCategories() {
-  const { i18n } = useTranslation();
-  const language = normalizeLanguage(i18n.resolvedLanguage || i18n.language);
-
-  return useQuery({
-    queryKey: ['catalog', 'categories', language],
-    queryFn: () => listCategories(language),
+  return useCatalogQuery({
+    key: ['categories'],
+    queryFn: listCategories,
   });
 }
 
 export function useProduct(slug?: string) {
-  const { i18n } = useTranslation();
-  const language = normalizeLanguage(i18n.resolvedLanguage || i18n.language);
-
-  return useQuery({
-    queryKey: ['catalog', 'product', slug, language],
-    queryFn: () => getProductBySlug(slug ?? '', language),
+  return useCatalogQuery({
+    key: ['product', slug],
+    queryFn: (language) => getProductBySlug(slug ?? '', language),
     enabled: Boolean(slug),
   });
 }
 
 export function useProductReviews(productId?: string) {
-  const { i18n } = useTranslation();
-  const language = normalizeLanguage(i18n.resolvedLanguage || i18n.language);
-
-  return useQuery({
-    queryKey: ['catalog', 'reviews', productId, language],
-    queryFn: () => listReviews(productId ?? '', language),
+  return useCatalogQuery({
+    key: ['reviews', productId],
+    queryFn: (language) => listReviews(productId ?? '', language),
     enabled: Boolean(productId),
   });
 }

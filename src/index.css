@@ -45,7 +45,6 @@
     --sidebar-border: 0 0% 91%;
     --sidebar-ring: 217 91% 60%;
 
-    /* Custom tokens */
     --success: 142 71% 45%;
     --success-foreground: 0 0% 98%;
     --warning: 38 92% 50%;
@@ -61,9 +60,6 @@
     --shadow-md: 0 4px 16px -2px hsl(0 0% 0% / 0.06);
     --shadow-lg: 0 12px 40px -8px hsl(0 0% 0% / 0.1);
     --shadow-xl: 0 24px 64px -16px hsl(0 0% 0% / 0.14);
-
-    --font-display: 'Playfair Display', Georgia, serif;
-    --font-body: 'Inter', system-ui, sans-serif;
   }
 
   .dark {
@@ -104,75 +100,83 @@
     --sidebar-border: 0 0% 14%;
     --sidebar-ring: 217 91% 60%;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
 
-  body {
-    @apply bg-background text-foreground font-body antialiased;
+  html {
+    @apply bg-background;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  body {
+    @apply min-h-screen bg-background font-body text-foreground antialiased selection:bg-primary selection:text-primary-foreground;
+  }
+
+  #root {
+    @apply min-h-screen;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-display;
+  }
+
+  a,
+  button,
+  input,
+  textarea,
+  select {
+    @apply transition-colors;
+  }
+
+  img {
+    @apply block max-w-full;
   }
 }
 
 @layer components {
   .container-premium {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
-  }
-
-  .text-gradient-premium {
-    background: var(--gradient-premium);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .glass-card {
-    @apply bg-card/80 backdrop-blur-lg border border-border/50 rounded-xl;
-    box-shadow: var(--shadow-md);
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
   }
 
   .premium-section {
     @apply py-20 md:py-32 lg:py-40;
   }
 
+  .glass-card {
+    @apply rounded-xl border border-border/50 bg-card/80 shadow-premium-md backdrop-blur-lg;
+  }
+
   .admin-card {
-    @apply bg-card border border-border rounded-xl p-6;
-    box-shadow: var(--shadow-sm);
+    @apply rounded-xl border border-border bg-card p-6 shadow-premium-sm;
+  }
+
+  .text-gradient-premium {
+    @apply bg-gradient-premium bg-clip-text text-transparent;
   }
 
   .input-premium {
-    @apply w-full rounded-lg border border-input bg-background px-4 py-3 text-sm
-    transition-all duration-200
-    focus:outline-none focus:ring-2 focus:ring-ring/20 focus:border-foreground/30
-    placeholder:text-muted-foreground;
+    @apply w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground shadow-premium-sm transition-all duration-200;
+    @apply focus:border-foreground/30 focus:outline-none focus:ring-2 focus:ring-ring/20;
   }
 
   .btn-premium {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3
-    bg-primary text-primary-foreground font-medium text-sm
-    transition-all duration-300 ease-out
-    hover:opacity-90 hover:shadow-lg
-    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
-    disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-premium-sm transition-all duration-300 ease-out;
+    @apply hover:opacity-90 hover:shadow-premium-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
   }
 
   .btn-premium-outline {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3
-    border border-foreground/20 text-foreground font-medium text-sm
-    transition-all duration-300 ease-out
-    hover:bg-foreground/5 hover:border-foreground/40
-    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
-    disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-foreground/20 bg-transparent px-6 py-3 text-sm font-medium text-foreground shadow-premium-sm transition-all duration-300 ease-out;
+    @apply hover:border-foreground/40 hover:bg-foreground/5 hover:shadow-premium-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
   }
 
   .badge-status {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
   }
 }
 
@@ -181,6 +185,7 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }

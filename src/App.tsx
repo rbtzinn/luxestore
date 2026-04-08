@@ -31,6 +31,29 @@ import InfoPage from './pages/InfoPage';
 
 const queryClient = new QueryClient();
 
+const storeRoutes = [
+  { path: '/', element: <Index /> },
+  { path: '/about', element: <About /> },
+  { path: '/products', element: <Products /> },
+  { path: '/products/:slug', element: <ProductDetail /> },
+  { path: '/cart', element: <Cart /> },
+  { path: '/checkout', element: <Checkout /> },
+  { path: '/wishlist', element: <Wishlist /> },
+  { path: '/categories', element: <Products /> },
+] as const;
+
+const infoRoutes = ['/contact', '/shipping', '/faq', '/size-guide', '/careers', '/press', '/sustainability', '/privacy', '/terms'] as const;
+
+const adminRoutes = [
+  { path: 'products', element: <AdminProducts /> },
+  { path: 'orders', element: <AdminOrders /> },
+  { path: 'categories', element: <AdminCategories /> },
+  { path: 'coupons', element: <AdminCoupons /> },
+  { path: 'banners', element: <AdminBanners /> },
+  { path: 'reviews', element: <AdminReviews /> },
+  { path: 'customers', element: <AdminCustomers /> },
+] as const;
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -41,36 +64,21 @@ const App = () => (
           <ScrollToTop />
           <Routes>
             <Route element={<StoreLayout />}>
-              <Route path="/" element={<Index />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/products/:slug" element={<ProductDetail />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/wishlist" element={<Wishlist />} />
-              <Route path="/categories" element={<Products />} />
-              <Route path="/contact" element={<InfoPage />} />
-              <Route path="/shipping" element={<InfoPage />} />
-              <Route path="/faq" element={<InfoPage />} />
-              <Route path="/size-guide" element={<InfoPage />} />
-              <Route path="/careers" element={<InfoPage />} />
-              <Route path="/press" element={<InfoPage />} />
-              <Route path="/sustainability" element={<InfoPage />} />
-              <Route path="/privacy" element={<InfoPage />} />
-              <Route path="/terms" element={<InfoPage />} />
+              {storeRoutes.map((route) => (
+                <Route key={route.path} path={route.path} element={route.element} />
+              ))}
+              {infoRoutes.map((path) => (
+                <Route key={path} path={path} element={<InfoPage />} />
+              ))}
             </Route>
 
             <Route path="/auth" element={<Auth />} />
 
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
-              <Route path="products" element={<AdminProducts />} />
-              <Route path="orders" element={<AdminOrders />} />
-              <Route path="categories" element={<AdminCategories />} />
-              <Route path="coupons" element={<AdminCoupons />} />
-              <Route path="banners" element={<AdminBanners />} />
-              <Route path="reviews" element={<AdminReviews />} />
-              <Route path="customers" element={<AdminCustomers />} />
+              {adminRoutes.map((route) => (
+                <Route key={route.path} path={route.path} element={route.element} />
+              ))}
             </Route>
 
             <Route path="*" element={<NotFound />} />

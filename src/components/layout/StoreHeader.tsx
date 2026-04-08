@@ -1,28 +1,52 @@
-import { useMemo, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import type { ReactNode } from 'react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, Heart, Search, Menu, X, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { NavLink } from '@/components/NavLink';
 import { useCartStore } from '@/store/cartStore';
 import { useWishlistStore } from '@/store/wishlistStore';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
+
+type HeaderIconLinkProps = {
+  to: string;
+  label: string;
+  badge?: number;
+  children: ReactNode;
+};
+
+const navLinkClassName = 'text-sm font-body font-medium transition-colors duration-200 tracking-wide text-muted-foreground hover:text-foreground';
+
+function HeaderIconLink({ to, label, badge, children }: HeaderIconLinkProps) {
+  return (
+    <Link
+      to={to}
+      className="p-2 text-muted-foreground hover:text-foreground transition-colors relative"
+      aria-label={label}
+    >
+      {children}
+      {badge ? (
+        <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-foreground text-background text-[10px] font-bold flex items-center justify-center">
+          {badge}
+        </span>
+      ) : null}
+    </Link>
+  );
+}
 
 export default function StoreHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const location = useLocation();
   const { t } = useTranslation();
-  const cartCount = useCartStore((s) => s.getItemCount());
-  const wishlistCount = useWishlistStore((s) => s.items.length);
+  const cartCount = useCartStore((state) => state.getItemCount());
+  const wishlistCount = useWishlistStore((state) => state.items.length);
 
-  const navLinks = useMemo(
-    () => [
-      { label: t('header.shop'), href: '/products' },
-      { label: t('header.categories'), href: '/categories' },
-      { label: t('header.about'), href: '/about' },
-    ],
-    [t],
-  );
+  const navLinks = [
+    { label: t('header.shop'), href: '/products' },
+    { label: t('header.categories'), href: '/categories' },
+    { label: t('header.about'), href: '/about' },
+  ];
 
   return (
     <>
@@ -36,60 +60,34 @@ export default function StoreHeader() {
 
             <nav className="hidden md:flex items-center gap-8">
               {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  to={link.href}
-                  className={`text-sm font-body font-medium transition-colors duration-200 tracking-wide ${location.pathname === link.href ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-                >
+                <NavLink key={link.href} to={link.href} className={navLinkClassName} activeClassName="text-foreground">
                   {link.label}
-                </Link>
+                </NavLink>
               ))}
             </nav>
 
             <div className="flex items-center gap-2 md:gap-3">
               <button
-                onClick={() => setSearchOpen(!searchOpen)}
+                onClick={() => setSearchOpen((current) => !current)}
                 className="p-2 text-muted-foreground hover:text-foreground transition-colors"
                 aria-label={t('common.search')}
               >
                 <Search className="w-5 h-5" />
               </button>
 
-              <Link
-                to="/wishlist"
-                className="p-2 text-muted-foreground hover:text-foreground transition-colors relative"
-                aria-label={t('common.wishlist')}
-              >
+              <HeaderIconLink to="/wishlist" label={t('common.wishlist')} badge={wishlistCount}>
                 <Heart className="w-5 h-5" />
-                {wishlistCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-foreground text-background text-[10px] font-bold flex items-center justify-center">
-                    {wishlistCount}
-                  </span>
-                )}
-              </Link>
+              </HeaderIconLink>
 
               <LanguageSwitcher />
 
-              <Link
-                to="/cart"
-                className="p-2 text-muted-foreground hover:text-foreground transition-colors relative"
-                aria-label={t('common.cart')}
-              >
+              <HeaderIconLink to="/cart" label={t('common.cart')} badge={cartCount}>
                 <ShoppingBag className="w-5 h-5" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-foreground text-background text-[10px] font-bold flex items-center justify-center">
-                    {cartCount}
-                  </span>
-                )}
-              </Link>
+              </HeaderIconLink>
 
-              <Link
-                to="/auth"
-                className="p-2 text-muted-foreground hover:text-foreground transition-colors"
-                aria-label={t('common.account')}
-              >
+              <HeaderIconLink to="/auth" label={t('common.account')}>
                 <User className="w-5 h-5" />
-              </Link>
+              </HeaderIconLink>
 
               <button
                 onClick={() => setMobileOpen(true)}
