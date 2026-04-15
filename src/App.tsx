@@ -1,5 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import AdminRoute from '@/components/auth/AdminRoute';
+import ProfileRoute from '@/components/auth/ProfileRoute';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -7,6 +9,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import StoreLayout from './components/layout/StoreLayout';
 import AdminLayout from './components/layout/AdminLayout';
 import ScrollToTop from './components/ScrollToTop';
+import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 
 import Index from './pages/Index';
@@ -16,6 +19,7 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Wishlist from './pages/Wishlist';
 import Auth from './pages/Auth';
+import Profile from './pages/Profile';
 import NotFound from './pages/NotFound';
 
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -57,34 +61,42 @@ const adminRoutes = [
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <LanguageProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <ScrollToTop />
-          <Routes>
-            <Route element={<StoreLayout />}>
-              {storeRoutes.map((route) => (
-                <Route key={route.path} path={route.path} element={route.element} />
-              ))}
-              {infoRoutes.map((path) => (
-                <Route key={path} path={path} element={<InfoPage />} />
-              ))}
-            </Route>
+      <AuthProvider>
+        <LanguageProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <ScrollToTop />
+            <Routes>
+              <Route element={<StoreLayout />}>
+                {storeRoutes.map((route) => (
+                  <Route key={route.path} path={route.path} element={route.element} />
+                ))}
+                {infoRoutes.map((path) => (
+                  <Route key={path} path={path} element={<InfoPage />} />
+                ))}
+              </Route>
 
-            <Route path="/auth" element={<Auth />} />
+              <Route path="/auth" element={<Auth />} />
 
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<AdminDashboard />} />
-              {adminRoutes.map((route) => (
-                <Route key={route.path} path={route.path} element={route.element} />
-              ))}
-            </Route>
+              <Route element={<ProfileRoute />}>
+                <Route path="/profile" element={<Profile />} />
+              </Route>
 
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </LanguageProvider>
+              <Route element={<AdminRoute />}>
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<AdminDashboard />} />
+                  {adminRoutes.map((route) => (
+                    <Route key={route.path} path={route.path} element={route.element} />
+                  ))}
+                </Route>
+              </Route>
+
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </LanguageProvider>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

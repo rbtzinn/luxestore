@@ -34,7 +34,18 @@ export default function ProductGridSection() {
                 <div className="relative aspect-square rounded-xl overflow-hidden bg-secondary mb-4">
                   <img src={product.images[0]?.url} alt={product.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
                   {product.sale_price && <div className="absolute top-3 left-3 bg-accent text-accent-foreground text-[10px] font-body font-semibold px-2 py-1 rounded-full">{t('common.sale')}</div>}
-                  <button onClick={(e) => { e.preventDefault(); isInWishlist(product.id) ? removeFromWishlist(product.id) : addToWishlist(product); }} className="absolute top-3 right-3 p-2 rounded-full bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-label={isInWishlist(product.id) ? t('common.remove') : t('common.wishlist')}>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (isInWishlist(product.id)) {
+                        removeFromWishlist(product.id);
+                        return;
+                      }
+                      addToWishlist(product);
+                    }}
+                    className="absolute top-3 right-3 p-2 rounded-full bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    aria-label={isInWishlist(product.id) ? t('common.remove') : t('common.wishlist')}
+                  >
                     <Heart className={`w-4 h-4 ${isInWishlist(product.id) ? 'fill-destructive text-destructive' : 'text-foreground'}`} />
                   </button>
                   <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">

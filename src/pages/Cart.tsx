@@ -33,33 +33,54 @@ export default function Cart() {
       <div className="container-premium py-12">
         <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-8">{t('cartPage.title')}</h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-12">
+          <div className="space-y-4 lg:col-span-2 lg:space-y-6">
             {items.map((item) => (
-              <motion.div key={item.id} layout className="flex gap-4 md:gap-6 p-4 glass-card">
-                <div className="w-24 h-24 md:w-32 md:h-32 rounded-lg overflow-hidden bg-secondary flex-shrink-0">
-                  <img src={item.product?.images[0]?.url || ''} alt={item.product?.title} className="w-full h-full object-cover" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <Link to={`/products/${item.product?.slug}`} className="text-sm md:text-base font-body font-medium text-foreground hover:text-accent transition-colors">
-                    {item.product?.title}
-                  </Link>
-                  <p className="text-xs font-body text-muted-foreground mt-1">{item.product?.brand}</p>
-                  <div className="flex items-center justify-between mt-4">
-                    <div className="flex items-center border border-border rounded-lg">
-                      <button onClick={() => updateQuantity(item.product_id, item.quantity - 1)} className="p-2" aria-label={t('cartPage.decrease')}>
-                        <Minus className="w-3 h-3" />
-                      </button>
-                      <span className="w-8 text-center text-sm font-body">{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.product_id, item.quantity + 1)} className="p-2" aria-label={t('cartPage.increase')}>
-                        <Plus className="w-3 h-3" />
-                      </button>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-sm font-body font-semibold text-foreground">{formatCurrency(item.price * item.quantity, language)}</span>
-                      <button onClick={() => removeItem(item.product_id)} className="text-muted-foreground hover:text-destructive transition-colors" aria-label={t('common.remove')}>
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+              <motion.div key={item.id} layout className="glass-card p-4">
+                <div className="flex items-start gap-3 md:gap-6">
+                  <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-secondary md:h-32 md:w-32">
+                    <img src={item.product?.images[0]?.url || ''} alt={item.product?.title} className="h-full w-full object-cover" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <Link
+                      to={`/products/${item.product?.slug}`}
+                      className="line-clamp-2 text-sm font-body font-medium text-foreground transition-colors hover:text-accent md:text-base"
+                    >
+                      {item.product?.title}
+                    </Link>
+                    <p className="mt-1 text-xs font-body text-muted-foreground">{item.product?.brand}</p>
+
+                    <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex w-fit items-center rounded-lg border border-border">
+                        <button
+                          onClick={() => updateQuantity(item.product_id, item.quantity - 1)}
+                          className="p-2"
+                          aria-label={t('cartPage.decrease')}
+                        >
+                          <Minus className="h-3 w-3" />
+                        </button>
+                        <span className="w-8 text-center text-sm font-body">{item.quantity}</span>
+                        <button
+                          onClick={() => updateQuantity(item.product_id, item.quantity + 1)}
+                          className="p-2"
+                          aria-label={t('cartPage.increase')}
+                        >
+                          <Plus className="h-3 w-3" />
+                        </button>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-3 sm:justify-end">
+                        <span className="text-sm font-body font-semibold text-foreground md:text-base">
+                          {formatCurrency(item.price * item.quantity, language)}
+                        </span>
+                        <button
+                          onClick={() => removeItem(item.product_id)}
+                          className="rounded-full p-2 text-muted-foreground transition-colors hover:text-destructive"
+                          aria-label={t('common.remove')}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -68,7 +89,7 @@ export default function Cart() {
           </div>
 
           <div className="lg:col-span-1">
-            <div className="glass-card p-6 sticky top-24">
+            <div className="sticky top-24 glass-card p-5 md:p-6">
               <h2 className="text-lg font-display font-semibold text-foreground mb-6">{t('cartPage.summary')}</h2>
               <div className="space-y-3 text-sm font-body">
                 <div className="flex justify-between">

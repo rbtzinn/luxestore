@@ -1,32 +1,64 @@
-# LUXE Store — DummyJSON build
+# LUXE Store
 
-Esta versão foi limpa para rodar **sem Supabase**.
+Este projeto roda em dois modos:
 
-## O que ela usa
+- `demo`: sem backend configurado, usando DummyJSON e painel admin visual
+- `supabase-ready`: com auth, guard e schema SQL preparados para plugar no Supabase
+
+## Stack
+
 - Vite + React + TypeScript
 - Tailwind + shadcn/ui
-- DummyJSON como fonte externa de produtos
-- Zustand para carrinho e wishlist locais
-
-## O que foi removido
-- Supabase
-- autenticação real
-- rotas protegidas
-- migrations e config de banco
+- React Query
+- Zustand
+- i18next
+- Supabase JS
 
 ## Como rodar
+
 ```bash
 npm install
 npm run dev
 ```
 
-## Variável opcional
-Se quiser trocar a base da API:
-```bash
+## Variaveis
+
+```env
 VITE_PRODUCTS_API_URL="https://dummyjson.com"
+VITE_SUPABASE_URL=""
+VITE_SUPABASE_ANON_KEY=""
+VITE_SUPABASE_ADMIN_EMAIL=""
 ```
 
-## Observações
-- catálogo, categorias e página de produto usam a DummyJSON
-- carrinho e wishlist ficam no navegador
-- painel admin está em modo visual/demo
+## Modos do projeto
+
+### Demo
+
+Sem credenciais Supabase:
+
+- catalogo via DummyJSON
+- carrinho e wishlist locais
+- admin visual/demo
+- `/admin` liberado
+
+### Supabase
+
+Com as variaveis preenchidas:
+
+- login real em `/auth`
+- cadastro com nome, username e senha
+- confirmacao por codigo de email
+- rota `/admin` protegida
+- estrutura SQL e RLS pronta
+
+Veja:
+
+`SUPABASE_SETUP.md`
+
+## Estado atual
+
+- auth real preparado
+- guard de admin preparado
+- schema SQL pronto
+- CRUD visual do admin pronto
+- persistencia real ainda depende das credenciais do seu projeto Supabase

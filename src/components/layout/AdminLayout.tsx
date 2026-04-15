@@ -2,11 +2,13 @@ import { useMemo, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Package, FolderTree, ShoppingCart, Users, Tag, Image, Star, Menu, X, LogOut, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/context/AuthContext';
 
 export default function AdminLayout() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { t } = useTranslation();
+  const { enabled, profile, signOut, user } = useAuth();
 
   const navItems = useMemo(
     () => [
@@ -53,10 +55,28 @@ export default function AdminLayout() {
           })}
         </nav>
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border">
-          <Link to="/" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-body text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
-            <LogOut className="w-4 h-4" />
-            {t('admin.backToStore')}
-          </Link>
+          <div className="space-y-2">
+            {enabled && user?.email ? (
+              <div className="rounded-lg border border-border px-3 py-2 text-xs font-body text-muted-foreground">
+                <p className="font-medium text-foreground">{profile?.full_name || profile?.username || user.email}</p>
+                <p className="mt-1">{profile?.username ? `@${profile.username}` : user.email}</p>
+              </div>
+            ) : null}
+            <Link to="/" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-body text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
+              <LogOut className="w-4 h-4" />
+              {t('admin.backToStore')}
+            </Link>
+            {enabled ? (
+              <button
+                type="button"
+                onClick={() => void signOut()}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-body text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                Sair do admin
+              </button>
+            ) : null}
+          </div>
         </div>
       </aside>
 
