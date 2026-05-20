@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Link, useSearchParams } from 'react-router-dom';
-import { Search, SlidersHorizontal, Heart, ChevronDown } from 'lucide-react';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { Search, SlidersHorizontal, Heart } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import ProductPrice from '@/components/product/ProductPrice';
 import RatingStars from '@/components/product/RatingStars';
+import { PremiumSelect } from '@/components/ui/premium-select';
 import { mockCategories } from '@/data/mockData';
 import { useCategories, useProducts } from '@/hooks/useCatalog';
 import { showAddedToCartToast, showWishlistToast } from '@/lib/cartFeedback';
@@ -39,6 +40,7 @@ function getCategoryButtonClass(isActive: boolean) {
 
 export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('relevance');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
@@ -46,12 +48,20 @@ export default function Products() {
   const hasMountedRef = useRef(false);
   const { t, i18n } = useTranslation();
   const language = i18n.resolvedLanguage || i18n.language;
-  const addToCart = useCartStore((state) => state.addItem);
+  const requestAddToCart = useCartStore((state) => state.requestAddItem);
+  const hasCartItem = useCartStore((state) => state.hasItem);
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore();
   const { data: products = [], isLoading } = useProducts();
   const { data: categoriesData = [] } = useCategories();
   const categories = categoriesData.length ? categoriesData : mockCategories;
   const categoryFromUrl = searchParams.get('category') || '';
+  const filterFromUrl = searchParams.get('filter') || '';
+  
+  const pageTitle = 
+    filterFromUrl === 'new' ? t('footer.newArrivals') :
+    filterFromUrl === 'sale' ? t('footer.sale') :
+    location.pathname === '/categories' ? t('common.categories') : 
+    t('productsPage.title');
 
   useEffect(() => {
     setSelectedCategory(categoryFromUrl);
@@ -83,8 +93,16 @@ export default function Products() {
       }
     }
 
+    if (filterFromUrl === 'new') {
+      result = result.filter((product) => product.featured);
+    }
+
+    if (filterFromUrl === 'sale') {
+      result = result.filter((product) => product.sale_price != null);
+    }
+
     return sortProducts(result, sortBy);
-  }, [categories, products, search, selectedCategory, sortBy]);
+  }, [categories, products, search, selectedCategory, sortBy, filterFromUrl]);
 
   const sortLabels: Record<SortOption, string> = {
     relevance: t('productsPage.relevance'),
@@ -114,7 +132,7 @@ export default function Products() {
       <div className="bg-secondary/30 py-16 md:py-24">
         <div className="container-premium">
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-4xl md:text-6xl font-display font-bold text-foreground mb-4">
-            {t('productsPage.title')}
+            {pageTitle}
           </motion.h1>
           <p className="text-base font-body text-muted-foreground">
             {isLoading ? t('common.loadingProducts') : t('productsPage.count_other', { count: filteredProducts.length })}
@@ -133,22 +151,18 @@ export default function Products() {
               <SlidersHorizontal className="w-4 h-4" />
               {t('common.filters')}
             </button>
-            <div className="relative">
-              <select value={sortBy} onChange={(event) => setSortBy(event.target.value as SortOption)} className="input-premium pr-10 appearance-none min-w-[180px]">
-                {sortOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {sortLabels[option]}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-            </div>
+            <PremiumSelect
+              value={sortBy}
+              onValueChange={setSortBy}
+              options={sortOptions.map((option) => ({ value: option, label: sortLabels[option] }))}
+              className="min-w-[180px]"
+            />
           </div>
         </div>
 
         <div className="flex gap-8">
-          <aside className={`${showFilters ? 'block' : 'hidden'} md:block w-full md:w-56 flex-shrink-0`}>
-            <div className="sticky top-24">
+          <aside className={`${showFilters ? 'block' : 'hidden'} md:block w-full md:w-56 flex-shrink-0 self-start sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto`}>
+            <div>
               <h3 className="text-xs font-body font-semibold tracking-[0.2em] uppercase text-muted-foreground mb-4">{t('common.categories')}</h3>
               <div className="space-y-2">
                 <button onClick={() => applyCategory('')} className={getCategoryButtonClass(!selectedCategory)}>
@@ -184,7 +198,6 @@ export default function Products() {
                               event.preventDefault();
                               if (isFavorite) {
                                 removeFromWishlist(product.id);
-                                showWishlistToast(product, false);
                               } else {
                                 addToWishlist(product);
                                 showWishlistToast(product, true);
@@ -199,8 +212,11 @@ export default function Products() {
                             <button
                               onClick={(event) => {
                                 event.preventDefault();
-                                addToCart(product);
-                                showAddedToCartToast(product);
+                                const alreadyInCart = hasCartItem(product.id);
+                                requestAddToCart(product);
+                                if (!alreadyInCart) {
+                                  showAddedToCartToast(product);
+                                }
                               }}
                               className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground text-xs font-body font-medium"
                             >

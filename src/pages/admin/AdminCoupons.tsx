@@ -19,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { PremiumSelect } from '@/components/ui/premium-select';
 import { mockCoupons } from '@/data/mockData';
 import { formatCurrency } from '@/lib/locale';
 import type { Coupon } from '@/types';
@@ -180,15 +181,19 @@ export default function AdminCoupons() {
 
               <label className="grid gap-2">
                 <span className="text-xs font-body font-medium uppercase tracking-[0.14em] text-muted-foreground">{t('admin.discount')}</span>
-                <select className="input-premium" value={formState.discountType} onChange={(event) => updateFormField('discountType', event.target.value as Coupon['discount_type'])}>
-                  <option value="percentage">Percentual</option>
-                  <option value="fixed">Valor fixo</option>
-                </select>
+                <PremiumSelect
+                  value={formState.discountType}
+                  onValueChange={(value) => updateFormField('discountType', value)}
+                  options={[
+                    { value: 'percentage', label: 'Percentual' },
+                    { value: 'fixed', label: 'Valor fixo' },
+                  ]}
+                />
               </label>
 
               <label className="grid gap-2 sm:col-span-2">
                 <span className="text-xs font-body font-medium uppercase tracking-[0.14em] text-muted-foreground">{t('admin.description')}</span>
-                <textarea className="input-premium min-h-28 resize-y" value={formState.description} onChange={(event) => updateFormField('description', event.target.value)} />
+                <textarea className="input-premium min-h-28" value={formState.description} onChange={(event) => updateFormField('description', event.target.value)} />
               </label>
 
               <label className="grid gap-2">

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { Product } from '@/types';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronRight,
@@ -12,6 +12,7 @@ import {
   Shield,
   ShoppingBag,
   Truck,
+  Zap,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import ProductPrice from '@/components/product/ProductPrice';
@@ -20,7 +21,6 @@ import { mockProducts } from '@/data/mockData';
 import { showAddedToCartToast, showWishlistToast } from '@/lib/cartFeedback';
 import { useCartStore } from '@/store/cartStore';
 import { useWishlistStore } from '@/store/wishlistStore';
-import { formatCurrency } from '@/lib/locale';
 import { useProduct, useProductReviews, useProducts } from '@/hooks/useCatalog';
 
 export default function ProductDetail() {
@@ -31,8 +31,9 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [isHovered, setIsHovered] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const navigate = useNavigate();
 
-  const { addItem: _addToCart } = useCartStore();
+  const { addItem: _addToCart, requestAddItem, hasItem } = useCartStore();
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore();
 
   const { data: dbProduct, isLoading } = useProduct(slug as string);
@@ -46,8 +47,16 @@ export default function ProductDetail() {
   );
 
   const addToCart = (product: Product, quantity: number) => {
+    const alreadyInCart = hasItem(product.id);
+    requestAddItem(product, quantity);
+    if (!alreadyInCart) {
+      showAddedToCartToast(product, quantity);
+    }
+  };
+
+  const buyNow = (product: Product, quantity: number) => {
     _addToCart(product, quantity);
-    showAddedToCartToast(product, quantity);
+    navigate('/checkout?step=payment');
   };
 
   useEffect(() => {
@@ -69,7 +78,6 @@ export default function ProductDetail() {
     return <div className="min-h-screen flex items-center justify-center text-sm text-muted-foreground">{t('common.loadingProduct')}</div>;
   }
 
-  const effectivePrice = product.sale_price ?? product.price;
   const highlights = [
     { icon: Truck, label: t('productPage.freeShipping') },
     { icon: Shield, label: t('productPage.securePayment') },
@@ -83,14 +91,12 @@ export default function ProductDetail() {
   const toggleWishlist = () => {
     const isFavorite = isInWishlist(product.id);
 
-    if (isFavorite) {
+    if (isInWishlist(product.id)) {
       removeFromWishlist(product.id);
-      showWishlistToast(product, false);
-      return;
+    } else {
+      addToWishlist(product);
+      showWishlistToast(product, true);
     }
-
-    addToWishlist(product);
-    showWishlistToast(product, true);
   };
 
   const nextImage = () => {
@@ -224,17 +230,28 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            <div className="flex gap-3 mb-8">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_auto] mb-8">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => buyNow(product, quantity)}
+                disabled={product.stock === 0}
+                className="btn-premium relative overflow-hidden group bg-gradient-premium"
+              >
+                <span className="absolute inset-0 bg-white/20 translate-y-[100%] group-hover:translate-y-[0%] transition-transform duration-300 ease-out rounded-lg" />
+                <Zap className="w-4 h-4 relative z-10" />
+                <span className="relative z-10">Comprar agora</span>
+              </motion.button>
               <motion.button 
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => addToCart(product, quantity)} 
                 disabled={product.stock === 0} 
-                className="btn-premium flex-1 relative overflow-hidden group"
+                className="btn-premium-outline relative overflow-hidden group"
               >
-                <span className="absolute inset-0 bg-white/20 translate-y-[100%] group-hover:translate-y-[0%] transition-transform duration-300 ease-out rounded-lg" />
+                <span className="absolute inset-0 bg-foreground/5 translate-y-[100%] group-hover:translate-y-[0%] transition-transform duration-300 ease-out rounded-lg" />
                 <ShoppingBag className="w-4 h-4 relative z-10" />
-                <span className="relative z-10">{t('common.addToCart')} - {formatCurrency(effectivePrice * quantity, language)}</span>
+                <span className="relative z-10 whitespace-nowrap">{t('common.addToCart')}</span>
               </motion.button>
               <button onClick={toggleWishlist} className="btn-premium-outline" aria-label={t('common.wishlist')}>
                 <Heart className={`w-5 h-5 transition-colors ${isInWishlist(product.id) ? 'fill-destructive text-destructive' : ''}`} />

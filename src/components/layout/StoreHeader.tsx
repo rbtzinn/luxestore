@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
-import { type ReactNode, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { type ReactNode, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Globe2, Heart, Menu, Search, ShoppingBag, User, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -7,6 +7,7 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { NavLink } from '@/components/NavLink';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
+import { useProducts } from '@/hooks/useCatalog';
 import { useCartStore } from '@/store/cartStore';
 import { useWishlistStore } from '@/store/wishlistStore';
 
@@ -75,18 +76,53 @@ function MobileMenuLink({
 export default function StoreHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showCatalogHeaderSearch, setShowCatalogHeaderSearch] = useState(false);
   const { t } = useTranslation();
+  const location = useLocation();
   const { isAuthenticated } = useAuth();
   const { currentLanguage, changeLanguage } = useLanguage();
   const cartCount = useCartStore((state) => state.getItemCount());
   const wishlistCount = useWishlistStore((state) => state.items.length);
+  const { data: products = [] } = useProducts();
   const accountPath = isAuthenticated ? '/profile' : '/auth';
+  const isCatalogPage = location.pathname === '/products' || location.pathname === '/categories';
+  const shouldShowSearchButton = !isCatalogPage || showCatalogHeaderSearch || searchOpen;
 
   const navLinks = [
-    { label: t('header.shop'), href: '/products' },
+    { label: t('header.shop'), href: '/store' },
     { label: t('header.categories'), href: '/categories' },
-    { label: t('header.about'), href: '/about' },
+    { label: t('footer.newArrivals'), href: '/products?filter=new' },
+    { label: t('footer.sale'), href: '/products?filter=sale' },
   ];
+
+  const searchResults = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
+    if (!query) return [];
+
+    return products
+      .filter((product) =>
+        [product.title, product.brand, product.description].some((value) => value.toLowerCase().includes(query)),
+      )
+      .slice(0, 5);
+  }, [products, searchQuery]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowCatalogHeaderSearch(window.scrollY > 360);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    setSearchOpen(false);
+    setSearchQuery('');
+  }, [location.pathname]);
 
   const closeMobileMenu = () => setMobileOpen(false);
 
@@ -111,13 +147,15 @@ export default function StoreHeader() {
             </nav>
 
             <div className="flex items-center gap-3 md:gap-5">
-              <button
-                onClick={() => setSearchOpen((current) => !current)}
-                className="p-2 text-muted-foreground transition-colors hover:text-foreground"
-                aria-label={t('common.search')}
-              >
-                <Search className="h-5 w-5" />
-              </button>
+              {shouldShowSearchButton ? (
+                <button
+                  onClick={() => setSearchOpen((current) => !current)}
+                  className="p-2 text-muted-foreground transition-colors hover:text-foreground"
+                  aria-label={t('common.search')}
+                >
+                  <Search className="h-5 w-5" />
+                </button>
+              ) : null}
 
               <div className="hidden md:block">
                 <HeaderIconLink to="/wishlist" label={t('common.wishlist')} badge={wishlistCount}>
@@ -157,10 +195,59 @@ export default function StoreHeader() {
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="overflow-hidden border-t border-border/50"
+              className="relative z-[80] border-t border-border/50"
             >
               <div className="container-premium py-4">
-                <input type="search" placeholder={t('header.searchPlaceholder')} className="input-premium" autoFocus />
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                    placeholder={t('header.searchPlaceholder')}
+                    className="input-premium pl-11 pr-12"
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (searchQuery) {
+                        setSearchQuery('');
+                        return;
+                      }
+
+                      setSearchOpen(false);
+                    }}
+                    className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                    aria-label="Fechar busca"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                  {searchQuery ? (
+                    <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-[120] max-h-96 overflow-y-auto rounded-xl border border-border/70 bg-background shadow-premium-lg">
+                      {searchResults.length ? (
+                        searchResults.map((product) => (
+                          <Link
+                            key={product.id}
+                            to={`/products/${product.slug}`}
+                            onClick={() => setSearchOpen(false)}
+                            className="flex gap-3 border-b border-border/60 p-3 last:border-0 hover:bg-secondary/40"
+                          >
+                            <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-secondary">
+                              <img src={product.images[0]?.url} alt={product.title} className="h-full w-full object-cover" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="truncate text-sm font-body font-medium text-foreground">{product.title}</p>
+                              <p className="mt-1 line-clamp-1 text-xs font-body text-muted-foreground">{product.description}</p>
+                            </div>
+                          </Link>
+                        ))
+                      ) : (
+                        <p className="p-4 text-sm text-muted-foreground">{t('common.noProductsFound')}</p>
+                      )}
+                    </div>
+                  ) : null}
+                </div>
               </div>
             </motion.div>
           )}

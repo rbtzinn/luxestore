@@ -1,6 +1,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import AdminRoute from '@/components/auth/AdminRoute';
+import DuplicateCartDialog from '@/components/cart/DuplicateCartDialog';
+import ConfirmWishlistRemoveDialog from '@/components/wishlist/ConfirmWishlistRemoveDialog';
 import ProfileRoute from '@/components/auth/ProfileRoute';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { Toaster } from '@/components/ui/toaster';
@@ -8,6 +10,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 
 import StoreLayout from './components/layout/StoreLayout';
 import AdminLayout from './components/layout/AdminLayout';
+import InputBehaviorGuards from './components/InputBehaviorGuards';
 import ScrollToTop from './components/ScrollToTop';
 import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
@@ -32,12 +35,14 @@ import AdminReviews from './pages/admin/AdminReviews';
 import AdminCustomers from './pages/admin/AdminCustomers';
 import About from './pages/About';
 import InfoPage from './pages/InfoPage';
+import StoreLocation from './pages/StoreLocation';
 
 const queryClient = new QueryClient();
 
 const storeRoutes = [
   { path: '/', element: <Index /> },
   { path: '/about', element: <About /> },
+  { path: '/store', element: <StoreLocation /> },
   { path: '/products', element: <Products /> },
   { path: '/products/:slug', element: <ProductDetail /> },
   { path: '/cart', element: <Cart /> },
@@ -63,6 +68,9 @@ const App = () => (
     <TooltipProvider>
       <AuthProvider>
         <LanguageProvider>
+          <InputBehaviorGuards />
+          <DuplicateCartDialog />
+          <ConfirmWishlistRemoveDialog />
           <Toaster />
           <Sonner />
           <BrowserRouter>

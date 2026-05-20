@@ -4,7 +4,12 @@ import type { CartItem, Product } from '@/types';
 
 interface CartState {
   items: CartItem[];
+  duplicatePending: { product: Product; quantity: number } | null;
   addItem: (product: Product, quantity?: number) => void;
+  requestAddItem: (product: Product, quantity?: number) => void;
+  confirmDuplicateAdd: () => void;
+  cancelDuplicateAdd: () => void;
+  hasItem: (productId: string) => boolean;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -16,6 +21,7 @@ export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      duplicatePending: null,
       addItem: (product, quantity = 1) => {
         set((state) => {
           const existing = state.items.find((i) => i.product_id === product.id);
@@ -42,6 +48,24 @@ export const useCartStore = create<CartState>()(
           };
         });
       },
+      requestAddItem: (product, quantity = 1) => {
+        if (get().hasItem(product.id)) {
+          set({ duplicatePending: { product, quantity } });
+          return;
+        }
+
+        get().addItem(product, quantity);
+      },
+      confirmDuplicateAdd: () => {
+        const pending = get().duplicatePending;
+
+        if (!pending) return;
+
+        get().addItem(pending.product, pending.quantity);
+        set({ duplicatePending: null });
+      },
+      cancelDuplicateAdd: () => set({ duplicatePending: null }),
+      hasItem: (productId) => get().items.some((item) => item.product_id === productId),
       removeItem: (productId) => {
         set((state) => ({
           items: state.items.filter((i) => i.product_id !== productId),
@@ -62,6 +86,9 @@ export const useCartStore = create<CartState>()(
       getTotal: () => get().items.reduce((sum, i) => sum + i.price * i.quantity, 0),
       getItemCount: () => get().items.reduce((sum, i) => sum + i.quantity, 0),
     }),
-    { name: 'luxe-cart' }
+    {
+      name: 'luxe-cart',
+      partialize: (state) => ({ items: state.items }),
+    }
   )
 );

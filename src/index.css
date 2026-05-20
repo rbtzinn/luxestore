@@ -107,10 +107,25 @@
 
   html {
     @apply bg-background;
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
   }
 
   body {
     @apply min-h-screen bg-background font-body text-foreground antialiased selection:bg-primary selection:text-primary-foreground;
+  }
+
+  body[data-scroll-locked] {
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+    overflow-y: scroll !important;
+    position: static !important;
+  }
+
+  body.with-scroll-bars-hidden {
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+    overflow-y: scroll !important;
   }
 
   #root {
@@ -132,6 +147,21 @@
   textarea,
   select {
     @apply transition-colors;
+  }
+
+  input[type='number'] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  textarea {
+    resize: none;
   }
 
   img {

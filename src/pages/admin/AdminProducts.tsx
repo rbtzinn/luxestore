@@ -20,6 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { PremiumSelect } from '@/components/ui/premium-select';
 import { mockCategories, mockProducts } from '@/data/mockData';
 import { useCategories, useProducts } from '@/hooks/useCatalog';
 import { formatCurrency } from '@/lib/locale';
@@ -257,13 +258,11 @@ export default function AdminProducts() {
 
               <label className="grid gap-2">
                 <span className="text-xs font-body font-medium uppercase tracking-[0.14em] text-muted-foreground">{t('productPage.category')}</span>
-                <select className="input-premium" value={formState.categoryId} onChange={(event) => updateFormField('categoryId', event.target.value)}>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
+                <PremiumSelect
+                  value={formState.categoryId}
+                  onValueChange={(value) => updateFormField('categoryId', value)}
+                  options={categories.map((category) => ({ value: category.id, label: category.name }))}
+                />
               </label>
 
               <label className="grid gap-2 sm:col-span-2">
@@ -273,7 +272,7 @@ export default function AdminProducts() {
 
               <label className="grid gap-2 sm:col-span-2">
                 <span className="text-xs font-body font-medium uppercase tracking-[0.14em] text-muted-foreground">{t('admin.description')}</span>
-                <textarea className="input-premium min-h-32 resize-y" value={formState.description} onChange={(event) => updateFormField('description', event.target.value)} />
+                <textarea className="input-premium min-h-32" value={formState.description} onChange={(event) => updateFormField('description', event.target.value)} />
               </label>
 
               <label className="sm:col-span-2 flex items-center justify-between rounded-lg border border-border bg-secondary/30 px-4 py-3">

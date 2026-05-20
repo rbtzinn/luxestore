@@ -9,7 +9,8 @@ import { showAddedToCartToast } from '@/lib/cartFeedback';
 
 export default function Wishlist() {
   const { items, removeItem, clearWishlist } = useWishlistStore();
-  const addToCart = useCartStore((state) => state.addItem);
+  const requestAddToCart = useCartStore((state) => state.requestAddItem);
+  const hasCartItem = useCartStore((state) => state.hasItem);
   const { t, i18n } = useTranslation();
   const language = i18n.resolvedLanguage || i18n.language;
 
@@ -53,8 +54,11 @@ export default function Wishlist() {
                     <button
                       onClick={(event) => {
                         event.preventDefault();
-                        addToCart(product);
-                        showAddedToCartToast(product);
+                        const alreadyInCart = hasCartItem(product.id);
+                        requestAddToCart(product);
+                        if (!alreadyInCart) {
+                          showAddedToCartToast(product);
+                        }
                       }}
                       className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground text-xs font-body font-medium"
                     >

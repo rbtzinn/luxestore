@@ -153,7 +153,7 @@ export default function AdminCategories() {
 
               <label className="grid gap-2">
                 <span className="text-xs font-body font-medium uppercase tracking-[0.14em] text-muted-foreground">{t('admin.description')}</span>
-                <textarea className="input-premium min-h-28 resize-y" value={formState.description} onChange={(event) => updateFormField('description', event.target.value)} />
+                <textarea className="input-premium min-h-28" value={formState.description} onChange={(event) => updateFormField('description', event.target.value)} />
               </label>
 
               <label className="grid gap-2">

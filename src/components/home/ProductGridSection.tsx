@@ -10,7 +10,8 @@ import { showAddedToCartToast, showWishlistToast } from '@/lib/cartFeedback';
 import { formatCurrency } from '@/lib/locale';
 
 export default function ProductGridSection() {
-  const addToCart = useCartStore((s) => s.addItem);
+  const requestAddToCart = useCartStore((s) => s.requestAddItem);
+  const hasCartItem = useCartStore((s) => s.hasItem);
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore();
   const { data: productsData = [] } = useProducts();
   const products = (productsData.length ? productsData : mockProducts).slice(0, 8);
@@ -40,7 +41,6 @@ export default function ProductGridSection() {
                       e.preventDefault();
                       if (isInWishlist(product.id)) {
                         removeFromWishlist(product.id);
-                        showWishlistToast(product, false);
                         return;
                       }
                       addToWishlist(product);
@@ -52,7 +52,19 @@ export default function ProductGridSection() {
                     <Heart className={`w-4 h-4 ${isInWishlist(product.id) ? 'fill-destructive text-destructive' : 'text-foreground'}`} />
                   </button>
                   <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <button onClick={(e) => { e.preventDefault(); addToCart(product); showAddedToCartToast(product); }} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground text-xs font-body font-medium hover:opacity-90 transition-opacity">{t('common.addToCart')}</button>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const alreadyInCart = hasCartItem(product.id);
+                        requestAddToCart(product);
+                        if (!alreadyInCart) {
+                          showAddedToCartToast(product);
+                        }
+                      }}
+                      className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground text-xs font-body font-medium hover:opacity-90 transition-opacity"
+                    >
+                      {t('common.addToCart')}
+                    </button>
                   </div>
                 </div>
               </Link>

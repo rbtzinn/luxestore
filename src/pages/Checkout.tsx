@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle, ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatCurrency } from '@/lib/locale';
@@ -17,9 +17,10 @@ const paymentMethods: PaymentMethod[] = ['credit_card', 'pix', 'boleto'];
 export default function Checkout() {
   const { items, getTotal, clearCart } = useCartStore();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { t, i18n } = useTranslation();
   const language = i18n.resolvedLanguage || i18n.language;
-  const [step, setStep] = useState<Step>('address');
+  const [step, setStep] = useState<Step>(() => (searchParams.get('step') === 'payment' ? 'payment' : 'address'));
   const [address, setAddress] = useState({
     street: '',
     number: '',

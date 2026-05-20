@@ -13,11 +13,10 @@ export default function LanguageSwitcher() {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          size="icon"
-          className="relative h-10 w-10 shrink-0 rounded-full border border-border/60 bg-transparent text-muted-foreground transition-colors hover:bg-transparent hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring data-[state=open]:bg-transparent data-[state=open]:text-foreground"
+          className="relative p-2 h-auto w-auto rounded-none border-0 bg-transparent text-muted-foreground transition-colors hover:bg-transparent hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring data-[state=open]:bg-transparent data-[state=open]:text-foreground"
           aria-label={t('languageSwitcher.openMenu')}
         >
-          {isChangingLanguage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Globe2 className="w-4 h-4" />}
+          {isChangingLanguage ? <Loader2 className="w-5 h-5 animate-spin" /> : <Globe2 className="w-5 h-5" />}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={10} className="w-52">
