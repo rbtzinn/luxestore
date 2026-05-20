@@ -7,6 +7,7 @@ import ProductPrice from '@/components/product/ProductPrice';
 import RatingStars from '@/components/product/RatingStars';
 import { mockCategories } from '@/data/mockData';
 import { useCategories, useProducts } from '@/hooks/useCatalog';
+import { showAddedToCartToast } from '@/lib/cartFeedback';
 import { animateScrollToTop } from '@/lib/scroll';
 import { useCartStore } from '@/store/cartStore';
 import { useWishlistStore } from '@/store/wishlistStore';
@@ -197,6 +198,7 @@ export default function Products() {
                               onClick={(event) => {
                                 event.preventDefault();
                                 addToCart(product);
+                                showAddedToCartToast(product);
                               }}
                               className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground text-xs font-body font-medium"
                             >

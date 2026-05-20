@@ -1,9 +1,18 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import type { Session, User } from '@supabase/supabase-js';
+import type { Session } from '@supabase/supabase-js';
+import {
+  backendRequest,
+  backendTokenStorageKey,
+  isBackendConfigured,
+  type BackendAuthResponse,
+  type BackendUser,
+} from '@/lib/backendAuth';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import type { Database } from '@/types/supabase';
 
 type UserProfileRow = Database['public']['Tables']['user_profiles']['Row'];
+type AuthUser = BackendUser | NonNullable<Session['user']>;
+type AuthSession = (Partial<Session> & { access_token: string; user: AuthUser }) | null;
 
 type SignUpPayload = {
   email: string;
@@ -17,8 +26,8 @@ type AuthContextValue = {
   isReady: boolean;
   isAuthenticated: boolean;
   isAdmin: boolean;
-  session: Session | null;
-  user: User | null;
+  session: AuthSession;
+  user: AuthUser | null;
   profile: UserProfileRow | null;
   signInWithPassword: (email: string, password: string) => Promise<{ error: string | null }>;
   signUpWithPassword: (payload: SignUpPayload) => Promise<{ error: string | null }>;
@@ -58,12 +67,52 @@ async function resolveAuthenticatedUser(session: Session | null) {
   return data.user;
 }
 
+function backendSession(accessToken: string, user: BackendUser): AuthSession {
+  return {
+    access_token: accessToken,
+    user,
+  };
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, setSession] = useState<AuthSession>(null);
   const [profile, setProfile] = useState<UserProfileRow | null>(null);
-  const [isReady, setIsReady] = useState(!isSupabaseConfigured);
+  const [isReady, setIsReady] = useState(!(isSupabaseConfigured || isBackendConfigured));
 
   useEffect(() => {
+    if (isBackendConfigured) {
+      let active = true;
+      const token = window.localStorage.getItem(backendTokenStorageKey);
+
+      if (!token) {
+        setIsReady(true);
+        return () => {
+          active = false;
+        };
+      }
+
+      setIsReady(false);
+
+      backendRequest<Omit<BackendAuthResponse, 'accessToken'>>('/api/auth/me', { token })
+        .then(({ user, profile: nextProfile }) => {
+          if (!active) return;
+          setSession(backendSession(token, user));
+          setProfile(nextProfile);
+          setIsReady(true);
+        })
+        .catch(() => {
+          if (!active) return;
+          window.localStorage.removeItem(backendTokenStorageKey);
+          setSession(null);
+          setProfile(null);
+          setIsReady(true);
+        });
+
+      return () => {
+        active = false;
+      };
+    }
+
     if (!supabase) return;
 
     let active = true;
@@ -114,7 +163,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AuthContextValue>(
     () => ({
-      enabled: isSupabaseConfigured,
+      enabled: isSupabaseConfigured || isBackendConfigured,
       isReady,
       isAuthenticated: Boolean(session?.user),
       isAdmin: profile?.role === 'admin',
@@ -122,11 +171,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user: session?.user ?? null,
       profile,
       signInWithPassword: async (email, password) => {
+        if (isBackendConfigured) {
+          try {
+            const data = await backendRequest<BackendAuthResponse>('/api/auth/login', {
+              body: { email, password },
+            });
+
+            window.localStorage.setItem(backendTokenStorageKey, data.accessToken);
+            setSession(backendSession(data.accessToken, data.user));
+            setProfile(data.profile);
+            return { error: null };
+          } catch (error) {
+            return { error: error instanceof Error ? error.message : 'Erro ao entrar.' };
+          }
+        }
+
         if (!supabase) return { error: 'Supabase ainda nao foi configurado.' };
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         return { error: error?.message ?? null };
       },
       signUpWithPassword: async ({ email, password, username, fullName }) => {
+        if (isBackendConfigured) {
+          try {
+            const data = await backendRequest<BackendAuthResponse>('/api/auth/signup', {
+              body: { email, password, username, fullName },
+            });
+
+            window.localStorage.setItem(backendTokenStorageKey, data.accessToken);
+            setSession(backendSession(data.accessToken, data.user));
+            setProfile(data.profile);
+            return { error: null };
+          } catch (error) {
+            return { error: error instanceof Error ? error.message : 'Erro ao cadastrar.' };
+          }
+        }
+
         if (!supabase) return { error: 'Supabase ainda nao foi configurado.' };
 
         const { error } = await supabase.auth.signUp({
@@ -143,6 +222,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error: error?.message ?? null };
       },
       verifyEmailOtp: async (email, token) => {
+        if (isBackendConfigured) return { error: null };
         if (!supabase) return { error: 'Supabase ainda nao foi configurado.' };
 
         const primaryAttempt = await supabase.auth.verifyOtp({ email, token, type: 'email' });
@@ -162,11 +242,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
       },
       resendSignupOtp: async (email) => {
+        if (isBackendConfigured) return { error: null };
         if (!supabase) return { error: 'Supabase ainda nao foi configurado.' };
         const { error } = await supabase.auth.resend({ type: 'signup', email });
         return { error: error?.message ?? null };
       },
       signOut: async () => {
+        if (isBackendConfigured) {
+          const token = session?.access_token;
+
+          if (token) {
+            await backendRequest('/api/auth/logout', { method: 'POST', token }).catch(() => undefined);
+          }
+
+          window.localStorage.removeItem(backendTokenStorageKey);
+          setSession(null);
+          setProfile(null);
+          return;
+        }
+
         if (!supabase) return;
         await supabase.auth.signOut();
       },

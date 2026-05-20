@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import ProductPrice from '@/components/product/ProductPrice';
 import { useCartStore } from '@/store/cartStore';
 import { useWishlistStore } from '@/store/wishlistStore';
+import { showAddedToCartToast } from '@/lib/cartFeedback';
 
 export default function Wishlist() {
   const { items, removeItem, clearWishlist } = useWishlistStore();
@@ -53,6 +54,7 @@ export default function Wishlist() {
                       onClick={(event) => {
                         event.preventDefault();
                         addToCart(product);
+                        showAddedToCartToast(product);
                       }}
                       className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground text-xs font-body font-medium"
                     >

@@ -1,9 +1,21 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Minus, Plus, Trash2, ArrowRight, ShoppingBag } from 'lucide-react';
+import { ArrowRight, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useCartStore } from '@/store/cartStore';
+import RatingStars from '@/components/product/RatingStars';
 import { formatCurrency } from '@/lib/locale';
+import { useCartStore } from '@/store/cartStore';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 export default function Cart() {
   const { items, removeItem, updateQuantity, getTotal, clearCart } = useCartStore();
@@ -31,61 +43,133 @@ export default function Cart() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container-premium py-12">
-        <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-8">{t('cartPage.title')}</h1>
+        <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="mb-2 text-xs font-body font-semibold uppercase tracking-[0.25em] text-muted-foreground">
+              {items.length} {items.length === 1 ? 'item selecionado' : 'itens selecionados'}
+            </p>
+            <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">{t('cartPage.title')}</h1>
+          </div>
+          <Link to="/products" className="text-sm font-body font-medium text-muted-foreground transition-colors hover:text-foreground">
+            Continuar comprando
+          </Link>
+        </div>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-12">
-          <div className="space-y-4 lg:col-span-2 lg:space-y-6">
-            {items.map((item) => (
-              <motion.div key={item.id} layout className="glass-card p-4">
-                <div className="flex items-start gap-3 md:gap-6">
-                  <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-secondary md:h-32 md:w-32">
-                    <img src={item.product?.images[0]?.url || ''} alt={item.product?.title} className="h-full w-full object-cover" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <Link
-                      to={`/products/${item.product?.slug}`}
-                      className="line-clamp-2 text-sm font-body font-medium text-foreground transition-colors hover:text-accent md:text-base"
-                    >
-                      {item.product?.title}
-                    </Link>
-                    <p className="mt-1 text-xs font-body text-muted-foreground">{item.product?.brand}</p>
+          <div className="space-y-4 lg:col-span-2">
+            {items.map((item) => {
+              const product = item.product;
+              const productUrl = product?.slug ? `/products/${product.slug}` : '/products';
+              const image = product?.images[0];
+              const lineTotal = item.price * item.quantity;
+              const maxQuantity = Math.max(product?.stock || item.quantity, 1);
 
-                    <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="flex w-fit items-center rounded-lg border border-border">
-                        <button
-                          onClick={() => updateQuantity(item.product_id, item.quantity - 1)}
-                          className="p-2"
-                          aria-label={t('cartPage.decrease')}
-                        >
-                          <Minus className="h-3 w-3" />
-                        </button>
-                        <span className="w-8 text-center text-sm font-body">{item.quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(item.product_id, item.quantity + 1)}
-                          className="p-2"
-                          aria-label={t('cartPage.increase')}
-                        >
-                          <Plus className="h-3 w-3" />
-                        </button>
+              return (
+                <motion.div key={item.id} layout className="glass-card p-4 md:p-5">
+                  <div className="grid grid-cols-[96px_1fr] gap-4 md:grid-cols-[144px_1fr] md:gap-6">
+                    <Link to={productUrl} className="h-24 w-24 overflow-hidden rounded-lg bg-secondary md:h-36 md:w-36">
+                      {image ? (
+                        <img src={image.url} alt={image.alt || product?.title || 'Produto'} className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center">
+                          <ShoppingBag className="h-8 w-8 text-muted-foreground/40" />
+                        </div>
+                      )}
+                    </Link>
+
+                    <div className="min-w-0">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="mb-1 text-xs font-body text-muted-foreground">{product?.brand || 'Produto'}</p>
+                          <Link to={productUrl} className="line-clamp-2 text-base font-body font-semibold text-foreground transition-colors hover:text-accent md:text-lg">
+                            {product?.title || 'Produto removido do catalogo'}
+                          </Link>
+                        </div>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <button
+                              type="button"
+                              className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                              aria-label={t('common.remove')}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Remover do carrinho?</AlertDialogTitle>
+                              <AlertDialogDescription>Tem certeza que deseja remover este item do seu carrinho?</AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => removeItem(item.product_id)}>Remover</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
 
-                      <div className="flex items-center justify-between gap-3 sm:justify-end">
-                        <span className="text-sm font-body font-semibold text-foreground md:text-base">
-                          {formatCurrency(item.price * item.quantity, language)}
-                        </span>
-                        <button
-                          onClick={() => removeItem(item.product_id)}
-                          className="rounded-full p-2 text-muted-foreground transition-colors hover:text-destructive"
-                          aria-label={t('common.remove')}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                      {product?.description ? (
+                        <p className="mt-2 line-clamp-2 text-sm font-body leading-relaxed text-muted-foreground">{product.description}</p>
+                      ) : null}
+
+                      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-body text-muted-foreground">
+                        {product?.category?.name ? <span>{product.category.name}</span> : null}
+                        {product?.sku ? <span>SKU {product.sku}</span> : null}
+                        {product ? (
+                          <span className={product.stock > 0 ? 'text-success' : 'text-destructive'}>
+                            {product.stock > 0 ? `${product.stock} em estoque` : 'Fora de estoque'}
+                          </span>
+                        ) : null}
+                      </div>
+
+                      {product ? (
+                        <div className="mt-3 flex items-center gap-2">
+                          <RatingStars rating={product.rating} className="h-3.5 w-3.5" />
+                          <span className="text-xs font-body text-muted-foreground">({product.review_count})</span>
+                        </div>
+                      ) : null}
+
+                      <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                        <div>
+                          <p className="mb-2 text-xs font-body uppercase tracking-[0.16em] text-muted-foreground">{t('common.quantity')}</p>
+                          <div className="flex w-fit items-center rounded-lg border border-border">
+                            <button
+                              type="button"
+                              onClick={() => updateQuantity(item.product_id, item.quantity - 1)}
+                              className="p-2.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                              aria-label={t('cartPage.decrease')}
+                            >
+                              <Minus className="h-4 w-4" />
+                            </button>
+                            <span className="w-11 text-center text-sm font-body font-medium text-foreground">{item.quantity}</span>
+                            <button
+                              type="button"
+                              onClick={() => updateQuantity(item.product_id, Math.min(maxQuantity, item.quantity + 1))}
+                              disabled={item.quantity >= maxQuantity}
+                              className="p-2.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+                              aria-label={t('cartPage.increase')}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-6 text-sm font-body sm:text-right">
+                          <div>
+                            <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Unitario</p>
+                            <p className="mt-1 font-medium text-foreground">{formatCurrency(item.price, language)}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Subtotal</p>
+                            <p className="mt-1 font-semibold text-foreground">{formatCurrency(lineTotal, language)}</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </div>
 
           <div className="lg:col-span-1">
@@ -105,13 +189,29 @@ export default function Cart() {
                   <span className="font-semibold text-foreground">{formatCurrency(total + shipping, language)}</span>
                 </div>
               </div>
-              {shipping > 0 && <p className="text-xs font-body text-muted-foreground mt-3">{t('cartPage.freeShippingNotice')}</p>}
+              {shipping > 0 ? <p className="text-xs font-body text-muted-foreground mt-3">{t('cartPage.freeShippingNotice')}</p> : null}
               <Link to="/checkout" className="btn-premium w-full mt-6">
                 {t('common.checkout')} <ArrowRight className="w-4 h-4" />
               </Link>
-              <button onClick={clearCart} className="w-full text-center text-xs font-body text-muted-foreground hover:text-destructive mt-3 transition-colors">
-                {t('common.clearCart')}
-              </button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <button className="w-full text-center text-xs font-body text-muted-foreground hover:text-destructive mt-3 transition-colors">
+                    {t('common.clearCart')}
+                  </button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Esvaziar carrinho?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Tem certeza que deseja remover todos os itens do carrinho? Esta acao nao pode ser desfeita.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={clearCart}>Esvaziar Carrinho</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         </div>

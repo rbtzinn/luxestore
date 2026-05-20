@@ -6,6 +6,7 @@ import { mockProducts } from '@/data/mockData';
 import { useCartStore } from '@/store/cartStore';
 import { useWishlistStore } from '@/store/wishlistStore';
 import { useProducts } from '@/hooks/useCatalog';
+import { showAddedToCartToast } from '@/lib/cartFeedback';
 import { formatCurrency } from '@/lib/locale';
 
 export default function ProductGridSection() {
@@ -49,7 +50,7 @@ export default function ProductGridSection() {
                     <Heart className={`w-4 h-4 ${isInWishlist(product.id) ? 'fill-destructive text-destructive' : 'text-foreground'}`} />
                   </button>
                   <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <button onClick={(e) => { e.preventDefault(); addToCart(product); }} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground text-xs font-body font-medium hover:opacity-90 transition-opacity">{t('common.addToCart')}</button>
+                    <button onClick={(e) => { e.preventDefault(); addToCart(product); showAddedToCartToast(product); }} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground text-xs font-body font-medium hover:opacity-90 transition-opacity">{t('common.addToCart')}</button>
                   </div>
                 </div>
               </Link>

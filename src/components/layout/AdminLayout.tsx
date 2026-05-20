@@ -3,6 +3,17 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Package, FolderTree, ShoppingCart, Users, Tag, Image, Star, Menu, X, LogOut, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 export default function AdminLayout() {
   const location = useLocation();
@@ -32,49 +43,61 @@ export default function AdminLayout() {
             <span className="text-lg font-display font-bold text-foreground">LUXE</span>
             <span className="text-[10px] font-body tracking-widest uppercase text-muted-foreground">{t('common.admin')}</span>
           </Link>
-          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-muted-foreground" aria-label={t('header.closeMenu')}>
+          <button type="button" onClick={() => setSidebarOpen(false)} className="p-2 text-muted-foreground lg:hidden" aria-label={t('header.closeMenu')}>
             <X className="w-5 h-5" />
           </button>
         </div>
-        <nav className="p-4 space-y-1">
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.href || (item.href !== '/admin' && location.pathname.startsWith(item.href));
-            return (
-              <Link
-                key={item.href}
-                to={item.href}
-                onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-body transition-colors ${
-                  isActive ? 'bg-primary text-primary-foreground font-medium' : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
-                }`}
-              >
-                <item.icon className="w-4 h-4" />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border">
-          <div className="space-y-2">
-            {enabled && user?.email ? (
-              <div className="rounded-lg border border-border px-3 py-2 text-xs font-body text-muted-foreground">
-                <p className="font-medium text-foreground">{profile?.full_name || profile?.username || user.email}</p>
-                <p className="mt-1">{profile?.username ? `@${profile.username}` : user.email}</p>
-              </div>
-            ) : null}
+
+        <div className="flex h-[calc(100vh-4rem)] flex-col justify-between p-4">
+          <nav className="space-y-1">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.href || (item.href !== '/admin' && location.pathname.startsWith(item.href));
+
+              return (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  onClick={() => setSidebarOpen(false)}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-body transition-colors ${
+                    isActive ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className="space-y-3 border-t border-border pt-4">
+            <div className="px-3">
+              <p className="text-sm font-body font-medium text-foreground">{profile?.full_name || user?.email || 'Administrador'}</p>
+              <p className="text-xs font-body text-muted-foreground">{enabled ? 'Sessao ativa' : 'Modo demonstracao'}</p>
+            </div>
             <Link to="/" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-body text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
               <LogOut className="w-4 h-4" />
               {t('admin.backToStore')}
             </Link>
             {enabled ? (
-              <button
-                type="button"
-                onClick={() => void signOut()}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-body text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                Sair do admin
-              </button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <button type="button" className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-body text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
+                    <LogOut className="w-4 h-4" />
+                    Sair do admin
+                  </button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Tem certeza que deseja sair?</AlertDialogTitle>
+                    <AlertDialogDescription>Sua sessao de administrador sera encerrada.</AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => void signOut()}>Sair</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             ) : null}
           </div>
         </div>
@@ -88,13 +111,15 @@ export default function AdminLayout() {
             <Menu className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2 text-xs font-body text-muted-foreground">
-            <Link to="/admin" className="hover:text-foreground transition-colors">{t('common.admin')}</Link>
-            {location.pathname !== '/admin' && (
+            <Link to="/admin" className="hover:text-foreground transition-colors">
+              {t('common.admin')}
+            </Link>
+            {location.pathname !== '/admin' ? (
               <>
                 <ChevronRight className="w-3 h-3" />
                 <span className="text-foreground capitalize">{navItems.find((item) => location.pathname.startsWith(item.href))?.label}</span>
               </>
-            )}
+            ) : null}
           </div>
         </header>
         <main className="p-4 lg:p-8">
