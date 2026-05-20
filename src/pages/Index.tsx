@@ -1,4 +1,5 @@
 import HeroSection from '@/components/home/HeroSection';
+import StorytellingSection from '@/components/home/StorytellingSection';
 import CategoriesSection from '@/components/home/CategoriesSection';
 import FeaturedProductSection from '@/components/home/FeaturedProductSection';
 import ProductGridSection from '@/components/home/ProductGridSection';
@@ -10,6 +11,7 @@ export default function Index() {
   return (
     <>
       <HeroSection />
+      <StorytellingSection />
       <CategoriesSection />
       <FeaturedProductSection />
       <ProductGridSection />

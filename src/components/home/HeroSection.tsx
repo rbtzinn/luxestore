@@ -13,12 +13,12 @@ export default function HeroSection() {
           initial={{ scale: 1.1 }}
           animate={{ scale: 1 }}
           transition={{ duration: 1.5, ease: "easeOut" }}
-          src="https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=1600&q=80" 
-          alt="Premium craftsmanship" 
-          className="w-full h-full object-cover opacity-60" 
+          src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&q=80" 
+          alt="Premium lifestyle" 
+          className="w-full h-full object-cover opacity-40" 
           loading="eager" 
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/80 via-primary/50 to-primary" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/60 via-primary/40 to-primary" />
       </div>
 
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto flex flex-col items-center">
@@ -26,25 +26,33 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 20 }} 
           animate={{ opacity: 1, y: 0 }} 
           transition={{ duration: 0.8, delay: 0.2 }} 
-          className="text-xs md:text-sm font-body tracking-[0.4em] uppercase text-primary-foreground/70 mb-6"
+          className="text-xs md:text-sm font-body tracking-[0.4em] uppercase text-primary-foreground/50 mb-6"
         >
-          {t('home.storyEyebrow')}
+          {t('home.heroEyebrow')}
         </motion.p>
         <motion.h1 
           initial={{ opacity: 0, y: 30 }} 
           animate={{ opacity: 1, y: 0 }} 
           transition={{ duration: 1, delay: 0.4 }} 
-          className="text-5xl md:text-7xl lg:text-8xl font-display font-bold text-primary-foreground leading-[1.1] mb-8"
+          className="text-5xl md:text-7xl lg:text-8xl font-display font-bold text-primary-foreground leading-[0.95] mb-8"
         >
-          {t('home.storyTitleLine1')}
+          {t('home.heroTitleLine1')}
           <br />
-          <span className="italic font-light">{t('home.storyTitleLine2')}</span>
+          <span className="italic font-light">{t('home.heroTitleLine2')}</span>
         </motion.h1>
+        <motion.p 
+          initial={{ opacity: 0, y: 20 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          transition={{ duration: 0.8, delay: 0.7 }} 
+          className="text-base md:text-lg font-body text-primary-foreground/60 max-w-lg mx-auto mb-10 leading-relaxed"
+        >
+          {t('home.heroDescription')}
+        </motion.p>
         
         <motion.div 
           initial={{ opacity: 0, y: 20 }} 
           animate={{ opacity: 1, y: 0 }} 
-          transition={{ duration: 0.8, delay: 0.8 }} 
+          transition={{ duration: 0.8, delay: 0.9 }} 
           className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <Link to="/products" className="inline-flex items-center gap-3 px-8 py-4 bg-primary-foreground text-primary rounded-lg font-body font-medium text-sm tracking-wide hover:opacity-90 transition-all duration-300 group">
