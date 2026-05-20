@@ -153,6 +153,13 @@ export default function Checkout() {
                     <input placeholder={t('checkoutPage.cardholder')} className="input-premium col-span-2" />
                   </div>
                 ) : null}
+                <div className="rounded-xl border border-border/70 bg-card/80 p-4 shadow-premium-sm">
+                  <h3 className="text-sm font-display font-semibold text-foreground mb-3">{t('checkoutPage.couponCode')}</h3>
+                  <div className="flex gap-2">
+                    <input value={coupon} onChange={(event) => setCoupon(event.target.value)} placeholder={t('checkoutPage.couponCode')} className="input-premium text-xs flex-1" />
+                    <button onClick={applyCoupon} className="btn-premium-outline text-xs px-4">{t('checkoutPage.apply')}</button>
+                  </div>
+                </div>
                 <div className="flex gap-3 mt-6">
                   <button onClick={() => setStep('address')} className="btn-premium-outline">{t('common.back')}</button>
                   <button onClick={() => setStep('review')} className="btn-premium">
@@ -196,10 +203,6 @@ export default function Checkout() {
               {discount > 0 ? <div className="flex justify-between"><span className="text-success">{t('checkoutPage.discount')}</span><span className="text-success">-{formatCurrency(discount, language)}</span></div> : null}
               <div className="flex justify-between"><span className="text-muted-foreground">{t('common.shipping')}</span><span>{shipping === 0 ? t('common.free') : formatCurrency(shipping, language)}</span></div>
               <div className="border-t border-border pt-2 flex justify-between font-semibold"><span>{t('common.total')}</span><span>{formatCurrency(total, language)}</span></div>
-            </div>
-            <div className="mt-4 flex gap-2">
-              <input value={coupon} onChange={(event) => setCoupon(event.target.value)} placeholder={t('checkoutPage.couponCode')} className="input-premium text-xs flex-1" />
-              <button onClick={applyCoupon} className="btn-premium-outline text-xs px-3">{t('checkoutPage.apply')}</button>
             </div>
           </div>
         </div>
