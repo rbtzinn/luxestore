@@ -30,6 +30,7 @@ type AuthContextValue = {
   profile: BackendProfile | null;
   signInWithPassword: (email: string, password: string) => Promise<{ error: string | null }>;
   signUpWithPassword: (payload: SignUpPayload) => Promise<{ error: string | null }>;
+  updateProfile: (payload: { fullName?: string; username?: string }) => Promise<{ error: string | null }>;
   verifyEmailOtp: (email: string, token: string) => Promise<{ error: string | null }>;
   resendSignupOtp: (email: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
@@ -123,6 +124,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return { error: null };
         } catch (error) {
           return { error: error instanceof Error ? error.message : 'Erro ao cadastrar.' };
+        }
+      },
+      updateProfile: async ({ fullName, username }) => {
+        if (!isBackendConfigured) return { error: 'Backend ainda nao foi configurado.' };
+        const token = session?.access_token;
+
+        if (!token) {
+          return { error: 'Entre na conta para atualizar o perfil.' };
+        }
+
+        try {
+          const data = await backendRequest<Omit<BackendAuthResponse, 'accessToken'>>('/api/profile', {
+            method: 'PATCH',
+            token,
+            body: {
+              ...(fullName !== undefined ? { fullName } : {}),
+              ...(username !== undefined ? { username } : {}),
+            },
+          });
+
+          setSession(backendSession(token, data.user));
+          setProfile(data.profile);
+          return { error: null };
+        } catch (error) {
+          return { error: error instanceof Error ? error.message : 'Erro ao atualizar perfil.' };
         }
       },
       verifyEmailOtp: async () => ({ error: null }),
