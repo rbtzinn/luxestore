@@ -1,4 +1,4 @@
-# LUXE Store
+# Helô Modas
 
 Este projeto roda em dois modos:
 

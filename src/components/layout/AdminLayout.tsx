@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Package, FolderTree, ShoppingCart, Users, Tag, Image, Star, Menu, X, LogOut, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 export default function AdminLayout() {
   const location = useLocation();
@@ -29,7 +30,7 @@ export default function AdminLayout() {
       <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex items-center justify-between h-16 px-6 border-b border-border">
           <Link to="/admin" className="flex items-center gap-2">
-            <span className="text-lg font-display font-bold text-foreground">LUXE</span>
+            <span className="text-lg font-display font-bold text-foreground">Helô Modas</span>
             <span className="text-[10px] font-body tracking-widest uppercase text-muted-foreground">{t('common.admin')}</span>
           </Link>
           <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-muted-foreground" aria-label={t('header.closeMenu')}>
@@ -67,14 +68,26 @@ export default function AdminLayout() {
               {t('admin.backToStore')}
             </Link>
             {enabled ? (
-              <button
-                type="button"
-                onClick={() => void signOut()}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-body text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                Sair do admin
-              </button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <button type="button" className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-body text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
+                    <LogOut className="w-4 h-4" />
+                    Sair do admin
+                  </button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Tem certeza que deseja sair?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Sua sessão de administrador será encerrada.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => void signOut()}>Sair</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             ) : null}
           </div>
         </div>

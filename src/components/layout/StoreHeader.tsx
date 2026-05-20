@@ -95,7 +95,7 @@ export default function StoreHeader() {
         <div className="container-premium">
           <div className="flex h-16 items-center justify-between gap-3 md:h-20">
             <Link to="/" className="flex items-center gap-2">
-              <span className="text-xl font-bold tracking-tight text-foreground md:text-2xl font-display">LUXE</span>
+              <span className="text-xl font-bold tracking-tight text-foreground md:text-2xl font-display">Helô Modas</span>
               <span className="hidden text-xs font-body font-light uppercase tracking-[0.3em] text-muted-foreground sm:inline">
                 Store
               </span>
@@ -176,7 +176,7 @@ export default function StoreHeader() {
           >
             <div className="container-premium flex min-h-dvh flex-col py-4">
               <div className="mb-10 flex items-center justify-between">
-                <span className="text-xl font-bold text-foreground font-display">LUXE</span>
+                <span className="text-xl font-bold text-foreground font-display">Helô Modas</span>
                 <button onClick={closeMobileMenu} className="p-2" aria-label={t('header.closeMenu')}>
                   <X className="h-6 w-6" />
                 </button>

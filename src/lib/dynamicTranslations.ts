@@ -2,7 +2,7 @@ import type { Banner, Category, Product, Review } from '@/types';
 import { normalizeLanguage, type AppLanguage } from '@/lib/locale';
 
 const CACHE_PREFIX = 'luxe_dynamic_translation_v1';
-const SPLITTER = '\n[[[LUXE_SPLIT]]]\n';
+const SPLITTER = '\n[[[Helô Modas_SPLIT]]]\n';
 const memoryCache = new Map<string, string>();
 
 function getCacheKey(language: AppLanguage, text: string) {

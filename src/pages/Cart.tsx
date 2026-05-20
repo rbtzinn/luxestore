@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Minus, Plus, Trash2, ArrowRight, ShoppingBag } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useCartStore } from '@/store/cartStore';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { formatCurrency } from '@/lib/locale';
 
 export default function Cart() {
@@ -73,13 +74,28 @@ export default function Cart() {
                         <span className="text-sm font-body font-semibold text-foreground md:text-base">
                           {formatCurrency(item.price * item.quantity, language)}
                         </span>
-                        <button
-                          onClick={() => removeItem(item.product_id)}
-                          className="rounded-full p-2 text-muted-foreground transition-colors hover:text-destructive"
-                          aria-label={t('common.remove')}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <button
+                              className="rounded-full p-2 text-muted-foreground transition-colors hover:text-destructive"
+                              aria-label={t('common.remove')}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Remover do carrinho?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Tem certeza que deseja remover este item do seu carrinho?
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => removeItem(item.product_id)}>Remover</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </div>
                   </div>
@@ -109,9 +125,25 @@ export default function Cart() {
               <Link to="/checkout" className="btn-premium w-full mt-6">
                 {t('common.checkout')} <ArrowRight className="w-4 h-4" />
               </Link>
-              <button onClick={clearCart} className="w-full text-center text-xs font-body text-muted-foreground hover:text-destructive mt-3 transition-colors">
-                {t('common.clearCart')}
-              </button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <button className="w-full text-center text-xs font-body text-muted-foreground hover:text-destructive mt-3 transition-colors">
+                    {t('common.clearCart')}
+                  </button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Esvaziar carrinho?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Tem certeza que deseja remover todos os itens do carrinho? Esta ação não pode ser desfeita.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={clearCart}>Esvaziar Carrinho</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         </div>
