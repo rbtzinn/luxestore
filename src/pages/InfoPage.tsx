@@ -31,7 +31,7 @@ export default function InfoPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-xs font-body font-semibold tracking-[0.28em] uppercase text-muted-foreground mb-4"
           >
-            LUXE Store
+            Helô Modas
           </motion.p>
 
           <motion.h1
@@ -73,7 +73,7 @@ export default function InfoPage() {
             transition={{ delay: 0.2 }}
             className="rounded-3xl border border-border/60 bg-primary text-primary-foreground p-8 md:p-10"
           >
-            <h2 className="text-2xl font-display font-bold mb-4">LUXE</h2>
+            <h2 className="text-2xl font-display font-bold mb-4">Helô Modas</h2>
             <p className="text-sm md:text-base font-body text-primary-foreground/70 leading-relaxed mb-6">
               {t('footer.description')}
             </p>

@@ -40,7 +40,7 @@ export default function AdminLayout() {
       <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex items-center justify-between h-16 px-6 border-b border-border">
           <Link to="/admin" className="flex items-center gap-2">
-            <span className="text-lg font-display font-bold text-foreground">LUXE</span>
+            <span className="text-lg font-display font-bold text-foreground">Helô Modas</span>
             <span className="text-[10px] font-body tracking-widest uppercase text-muted-foreground">{t('common.admin')}</span>
           </Link>
           <button type="button" onClick={() => setSidebarOpen(false)} className="p-2 text-muted-foreground lg:hidden" aria-label={t('header.closeMenu')}>

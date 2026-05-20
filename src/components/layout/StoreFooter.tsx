@@ -41,7 +41,7 @@ export default function StoreFooter() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           <div className="lg:col-span-1">
             <Link to="/" className="inline-block mb-4">
-              <span className="text-2xl font-display font-bold tracking-tight">LUXE</span>
+              <span className="text-2xl font-display font-bold tracking-tight">Helô Modas</span>
             </Link>
             <p className="text-sm text-primary-foreground/60 font-body leading-relaxed max-w-xs">{t('footer.description')}</p>
           </div>
@@ -66,7 +66,7 @@ export default function StoreFooter() {
 
         <div className="mt-16 pt-8 border-t border-primary-foreground/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-primary-foreground/40 font-body">
-            © {new Date().getFullYear()} LUXE Store. {t('footer.rights')}
+            © {new Date().getFullYear()} Helô Modas. {t('footer.rights')}
           </p>
           <div className="flex gap-6">
             <Link to="/privacy" className="text-xs text-primary-foreground/40 hover:text-primary-foreground/60 font-body transition-colors">

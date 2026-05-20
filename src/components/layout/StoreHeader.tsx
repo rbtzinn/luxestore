@@ -1,6 +1,5 @@
-import type { ReactNode } from 'react';
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { type ReactNode, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Globe2, Heart, Menu, Search, ShoppingBag, User, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -26,15 +25,17 @@ function HeaderIconLink({ to, label, badge, children, className }: HeaderIconLin
   return (
     <Link
       to={to}
-      className={`relative p-2 text-muted-foreground transition-colors hover:text-foreground ${className ?? ''}`}
+      className={`relative p-2 text-muted-foreground transition-colors hover:text-foreground flex items-center justify-center ${className ?? ''}`}
       aria-label={label}
     >
-      {children}
-      {badge ? (
-        <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-[10px] font-bold text-background">
-          {badge}
-        </span>
-      ) : null}
+      <div className="relative">
+        {children}
+        {badge ? (
+          <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground px-1 border border-background shadow-premium-sm">
+            {badge}
+          </span>
+        ) : null}
+      </div>
     </Link>
   );
 }
@@ -55,13 +56,13 @@ function MobileMenuLink({
   return (
     <Link
       to={to}
-      className="flex items-center justify-between rounded-2xl border border-border/70 px-4 py-3 text-sm font-body font-medium text-foreground"
+      className="flex items-center justify-between rounded-2xl border border-border/70 px-4 py-3 text-sm font-body font-medium text-foreground hover:bg-secondary/50 transition-colors"
       onClick={onNavigate}
     >
       <span>{label}</span>
       <span className="flex items-center gap-3">
         {badge ? (
-          <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-foreground px-1.5 text-[10px] font-bold text-background">
+          <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground">
             {badge}
           </span>
         ) : null}
@@ -95,7 +96,7 @@ export default function StoreHeader() {
         <div className="container-premium">
           <div className="flex h-16 items-center justify-between gap-3 md:h-20">
             <Link to="/" className="flex items-center gap-2">
-              <span className="text-xl font-bold tracking-tight text-foreground md:text-2xl font-display">LUXE</span>
+              <span className="text-xl font-bold tracking-tight text-foreground md:text-2xl font-display">Helô Modas</span>
               <span className="hidden text-xs font-body font-light uppercase tracking-[0.3em] text-muted-foreground sm:inline">
                 Store
               </span>
@@ -109,7 +110,7 @@ export default function StoreHeader() {
               ))}
             </nav>
 
-            <div className="flex items-center gap-1 md:gap-3">
+            <div className="flex items-center gap-3 md:gap-5">
               <button
                 onClick={() => setSearchOpen((current) => !current)}
                 className="p-2 text-muted-foreground transition-colors hover:text-foreground"
@@ -172,11 +173,11 @@ export default function StoreHeader() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] bg-background"
+            className="fixed inset-0 z-[60] bg-background overflow-y-auto"
           >
             <div className="container-premium flex min-h-dvh flex-col py-4">
               <div className="mb-10 flex items-center justify-between">
-                <span className="text-xl font-bold text-foreground font-display">LUXE</span>
+                <span className="text-xl font-bold text-foreground font-display">Helô Modas</span>
                 <button onClick={closeMobileMenu} className="p-2" aria-label={t('header.closeMenu')}>
                   <X className="h-6 w-6" />
                 </button>
@@ -256,7 +257,7 @@ export default function StoreHeader() {
                     setSearchOpen((current) => !current);
                     closeMobileMenu();
                   }}
-                  className="flex w-full items-center justify-center gap-2 rounded-full border border-border/70 px-5 py-3 text-sm font-body font-medium text-foreground"
+                  className="flex w-full items-center justify-center gap-2 rounded-full border border-border/70 px-5 py-3 text-sm font-body font-medium text-foreground hover:bg-secondary/50 transition-colors"
                 >
                   <Search className="h-4 w-4" />
                   {t('common.search')}
