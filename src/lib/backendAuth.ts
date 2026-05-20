@@ -1,5 +1,3 @@
-import type { Database } from '@/types/supabase';
-
 export type BackendUser = {
   id: string;
   email: string;
@@ -8,7 +6,17 @@ export type BackendUser = {
   updatedAt: string;
 };
 
-export type BackendProfile = Database['public']['Tables']['user_profiles']['Row'];
+export type BackendProfile = {
+  avatar_url: string | null;
+  created_at: string;
+  email: string;
+  full_name: string;
+  id: string;
+  phone: string | null;
+  role: 'admin' | 'staff' | 'customer';
+  updated_at?: string;
+  username: string;
+};
 
 export type BackendAuthResponse = {
   accessToken: string;

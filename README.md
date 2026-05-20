@@ -1,9 +1,9 @@
-# LUXE Store
+# Helo Modas
 
 Este projeto roda em dois modos:
 
-- `demo`: sem backend configurado, usando DummyJSON e painel admin visual
-- `supabase-ready`: com auth, guard e schema SQL preparados para plugar no Supabase
+- `demo`: sem backend configurado, usando DummyJSON e painel admin visual.
+- `backend`: com API propria em `backend/`, pronta para publicar na Vercel.
 
 ## Stack
 
@@ -12,7 +12,7 @@ Este projeto roda em dois modos:
 - React Query
 - Zustand
 - i18next
-- Supabase JS
+- Vercel Functions no backend
 
 ## Como rodar
 
@@ -25,40 +25,36 @@ npm run dev
 
 ```env
 VITE_PRODUCTS_API_URL="https://dummyjson.com"
-VITE_SUPABASE_URL=""
-VITE_SUPABASE_ANON_KEY=""
-VITE_SUPABASE_ADMIN_EMAIL=""
+VITE_BACKEND_API_URL=""
 ```
 
 ## Modos do projeto
 
 ### Demo
 
-Sem credenciais Supabase:
+Sem `VITE_BACKEND_API_URL`:
 
 - catalogo via DummyJSON
 - carrinho e wishlist locais
 - admin visual/demo
 - `/admin` liberado
 
-### Supabase
+### Backend
 
-Com as variaveis preenchidas:
+Com `VITE_BACKEND_API_URL` preenchida:
 
 - login real em `/auth`
 - cadastro com nome, username e senha
-- confirmacao por codigo de email
 - rota `/admin` protegida
-- estrutura SQL e RLS pronta
+- perfil persistido via API
 
-Veja:
+Veja as instrucoes em:
 
-`SUPABASE_SETUP.md`
+`backend/README.md`
 
 ## Estado atual
 
-- auth real preparado
-- guard de admin preparado
-- schema SQL pronto
+- auth real via backend proprio
+- guard de admin conectado ao backend
 - CRUD visual do admin pronto
-- persistencia real ainda depende das credenciais do seu projeto Supabase
+- persistencia real depende das variaveis KV/Upstash no projeto backend da Vercel
