@@ -4,6 +4,7 @@ import {
   backendTokenStorageKey,
   isBackendConfigured,
   type BackendAuthResponse,
+  type BackendAddress,
   type BackendProfile,
   type BackendUser,
 } from '@/lib/backendAuth';
@@ -30,7 +31,7 @@ type AuthContextValue = {
   profile: BackendProfile | null;
   signInWithPassword: (email: string, password: string) => Promise<{ error: string | null }>;
   signUpWithPassword: (payload: SignUpPayload) => Promise<{ error: string | null }>;
-  updateProfile: (payload: { fullName?: string; username?: string }) => Promise<{ error: string | null }>;
+  updateProfile: (payload: { address?: BackendAddress; fullName?: string; username?: string }) => Promise<{ error: string | null }>;
   verifyEmailOtp: (email: string, token: string) => Promise<{ error: string | null }>;
   resendSignupOtp: (email: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
@@ -126,7 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return { error: error instanceof Error ? error.message : 'Erro ao cadastrar.' };
         }
       },
-      updateProfile: async ({ fullName, username }) => {
+      updateProfile: async ({ address, fullName, username }) => {
         if (!isBackendConfigured) return { error: 'Backend ainda nao foi configurado.' };
         const token = session?.access_token;
 
@@ -139,6 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             method: 'PATCH',
             token,
             body: {
+              ...(address !== undefined ? { address } : {}),
               ...(fullName !== undefined ? { fullName } : {}),
               ...(username !== undefined ? { username } : {}),
             },

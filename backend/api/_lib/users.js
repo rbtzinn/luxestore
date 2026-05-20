@@ -18,6 +18,23 @@ function normalizeUsername(username) {
     .replace(/[^a-z0-9._-]/g, '');
 }
 
+function normalizeAddress(address) {
+  if (!address || typeof address !== 'object') {
+    return null;
+  }
+
+  return {
+    street: String(address.street || '').trim(),
+    number: String(address.number || '').trim(),
+    complement: String(address.complement || '').trim(),
+    neighborhood: String(address.neighborhood || '').trim(),
+    city: String(address.city || '').trim(),
+    state: String(address.state || '').trim(),
+    zip: String(address.zip || '').trim(),
+    country: String(address.country || 'Brasil').trim() || 'Brasil',
+  };
+}
+
 function assertValidSignup(payload) {
   const email = normalizeEmail(payload.email);
   const username = normalizeUsername(payload.username);
@@ -73,6 +90,7 @@ export async function createUser(payload) {
       username,
       full_name: fullName,
       avatar_url: null,
+      address: null,
       phone: null,
       role: email === process.env.ADMIN_EMAIL?.trim().toLowerCase() ? 'admin' : 'customer',
       created_at: now,
@@ -119,6 +137,10 @@ export async function updateUserProfile(user, payload) {
 
   if (payload.avatarUrl !== undefined) {
     updates.avatar_url = payload.avatarUrl ? String(payload.avatarUrl).trim() : null;
+  }
+
+  if (payload.address !== undefined) {
+    updates.address = normalizeAddress(payload.address);
   }
 
   if (payload.username !== undefined) {

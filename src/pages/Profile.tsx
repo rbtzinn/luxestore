@@ -5,6 +5,18 @@ import { ArrowRight, LogOut, MapPin, Save, ShieldCheck, UserRound } from 'lucide
 import { toast } from 'sonner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useAuth } from '@/context/AuthContext';
+import type { BackendAddress } from '@/lib/backendAuth';
+
+const emptyAddress: BackendAddress = {
+  street: '',
+  number: '',
+  complement: '',
+  neighborhood: '',
+  city: '',
+  state: '',
+  zip: '',
+  country: 'Brasil',
+};
 
 function normalizeUsername(value: string) {
   return value
@@ -20,29 +32,35 @@ export default function Profile() {
   const [fullName, setFullName] = useState(profile?.full_name || '');
   const [username, setUsername] = useState(profile?.username || '');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
-  const [address, setAddress] = useState({
-    street: '',
-    number: '',
-    complement: '',
-    neighborhood: '',
-    city: '',
-    state: '',
-    zip: '',
-    country: 'Brasil',
-  });
+  const [isSavingAddress, setIsSavingAddress] = useState(false);
+  const [address, setAddress] = useState<BackendAddress>(profile?.address || emptyAddress);
 
   useEffect(() => {
     setFullName(profile?.full_name || '');
     setUsername(profile?.username || '');
-  }, [profile?.full_name, profile?.username]);
+    setAddress(profile?.address || emptyAddress);
+  }, [profile?.address, profile?.full_name, profile?.username]);
 
   const handleAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setAddress((current) => ({ ...current, [name]: value }));
   };
 
-  const handleSaveAddress = () => {
-    toast.success('Endereco salvo com sucesso!');
+  const handleSaveAddress = async () => {
+    setIsSavingAddress(true);
+
+    try {
+      const { error } = await updateProfile({ address });
+
+      if (error) {
+        toast.error(error);
+        return;
+      }
+
+      toast.success('Endereco salvo com sucesso!');
+    } finally {
+      setIsSavingAddress(false);
+    }
   };
 
   const handleSaveProfile = async () => {
@@ -196,9 +214,9 @@ export default function Profile() {
             </div>
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <button type="button" onClick={handleSaveAddress} className="btn-premium-outline justify-center sm:w-auto">
+              <button type="button" onClick={() => void handleSaveAddress()} disabled={isSavingAddress} className="btn-premium-outline justify-center sm:w-auto">
                 <Save className="h-4 w-4" />
-                Salvar endereco
+                {isSavingAddress ? 'Salvando...' : 'Salvar endereco'}
               </button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>

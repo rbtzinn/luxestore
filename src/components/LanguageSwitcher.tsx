@@ -1,4 +1,4 @@
-import { Check, ChevronDown, Globe2, Loader2 } from 'lucide-react';
+import { Check, Globe2, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,7 @@ export default function LanguageSwitcher() {
   const { currentLanguage, isChangingLanguage, changeLanguage } = useLanguage();
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
@@ -18,7 +18,6 @@ export default function LanguageSwitcher() {
           aria-label={t('languageSwitcher.openMenu')}
         >
           {isChangingLanguage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Globe2 className="w-4 h-4" />}
-          <ChevronDown className="absolute bottom-1 right-1 h-3 w-3 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={10} className="w-52">

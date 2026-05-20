@@ -6,7 +6,19 @@ export type BackendUser = {
   updatedAt: string;
 };
 
+export type BackendAddress = {
+  street: string;
+  number: string;
+  complement: string;
+  neighborhood: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
+};
+
 export type BackendProfile = {
+  address: BackendAddress | null;
   avatar_url: string | null;
   created_at: string;
   email: string;
