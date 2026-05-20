@@ -6,7 +6,7 @@ import { mockProducts } from '@/data/mockData';
 import { useCartStore } from '@/store/cartStore';
 import { useWishlistStore } from '@/store/wishlistStore';
 import { useProducts } from '@/hooks/useCatalog';
-import { showAddedToCartToast } from '@/lib/cartFeedback';
+import { showAddedToCartToast, showWishlistToast } from '@/lib/cartFeedback';
 import { formatCurrency } from '@/lib/locale';
 
 export default function ProductGridSection() {
@@ -40,9 +40,11 @@ export default function ProductGridSection() {
                       e.preventDefault();
                       if (isInWishlist(product.id)) {
                         removeFromWishlist(product.id);
+                        showWishlistToast(product, false);
                         return;
                       }
                       addToWishlist(product);
+                      showWishlistToast(product, true);
                     }}
                     className="absolute top-3 right-3 p-2 rounded-full bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                     aria-label={isInWishlist(product.id) ? t('common.remove') : t('common.wishlist')}

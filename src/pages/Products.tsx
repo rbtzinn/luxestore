@@ -7,7 +7,7 @@ import ProductPrice from '@/components/product/ProductPrice';
 import RatingStars from '@/components/product/RatingStars';
 import { mockCategories } from '@/data/mockData';
 import { useCategories, useProducts } from '@/hooks/useCatalog';
-import { showAddedToCartToast } from '@/lib/cartFeedback';
+import { showAddedToCartToast, showWishlistToast } from '@/lib/cartFeedback';
 import { animateScrollToTop } from '@/lib/scroll';
 import { useCartStore } from '@/store/cartStore';
 import { useWishlistStore } from '@/store/wishlistStore';
@@ -184,8 +184,10 @@ export default function Products() {
                               event.preventDefault();
                               if (isFavorite) {
                                 removeFromWishlist(product.id);
+                                showWishlistToast(product, false);
                               } else {
                                 addToWishlist(product);
+                                showWishlistToast(product, true);
                               }
                             }}
                             className="absolute top-3 right-3 p-2 rounded-full bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"

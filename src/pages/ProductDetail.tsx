@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 import ProductPrice from '@/components/product/ProductPrice';
 import RatingStars from '@/components/product/RatingStars';
 import { mockProducts } from '@/data/mockData';
-import { showAddedToCartToast } from '@/lib/cartFeedback';
+import { showAddedToCartToast, showWishlistToast } from '@/lib/cartFeedback';
 import { useCartStore } from '@/store/cartStore';
 import { useWishlistStore } from '@/store/wishlistStore';
 import { formatCurrency } from '@/lib/locale';
@@ -80,7 +80,18 @@ export default function ProductDetail() {
     { label: t('productPage.category'), value: product.category?.name },
     { label: t('productPage.brand'), value: product.brand },
   ];
-  const toggleWishlist = () => (isInWishlist(product.id) ? removeFromWishlist(product.id) : addToWishlist(product));
+  const toggleWishlist = () => {
+    const isFavorite = isInWishlist(product.id);
+
+    if (isFavorite) {
+      removeFromWishlist(product.id);
+      showWishlistToast(product, false);
+      return;
+    }
+
+    addToWishlist(product);
+    showWishlistToast(product, true);
+  };
 
   const nextImage = () => {
     setSelectedImage((prev) => (prev + 1) % product.images.length);
