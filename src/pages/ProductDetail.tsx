@@ -240,7 +240,7 @@ export default function ProductDetail() {
               >
                 <span className="absolute inset-0 bg-white/20 translate-y-[100%] group-hover:translate-y-[0%] transition-transform duration-300 ease-out rounded-lg" />
                 <Zap className="w-4 h-4 relative z-10" />
-                <span className="relative z-10">Comprar agora</span>
+                <span className="relative z-10">{t('common.shopNow')}</span>
               </motion.button>
               <motion.button 
                 whileHover={{ scale: 1.02 }}
