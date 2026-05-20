@@ -14,14 +14,14 @@ export default function LanguageSwitcher() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative rounded-full border border-border/60 bg-background/80 backdrop-blur-sm hover:bg-secondary/70"
+          className="relative h-10 w-10 shrink-0 rounded-full border border-border/60 bg-transparent text-muted-foreground transition-colors hover:bg-transparent hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring data-[state=open]:bg-transparent data-[state=open]:text-foreground"
           aria-label={t('languageSwitcher.openMenu')}
         >
           {isChangingLanguage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Globe2 className="w-4 h-4" />}
-          <ChevronDown className="absolute -right-1 -bottom-1 w-3 h-3 rounded-full bg-background text-muted-foreground" />
+          <ChevronDown className="absolute bottom-1 right-1 h-3 w-3 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-52">
+      <DropdownMenuContent align="end" sideOffset={10} className="w-52">
         <DropdownMenuLabel>{t('languageSwitcher.current')}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => changeLanguage('pt-BR')} className="cursor-pointer justify-between">
