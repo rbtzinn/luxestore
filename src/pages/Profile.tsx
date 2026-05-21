@@ -249,6 +249,13 @@ export default function Profile() {
     <div className="min-h-screen bg-background pt-24 pb-12">
       <div className="container-premium max-w-6xl mx-auto">
         
+        <div className="mb-6">
+          <Link to="/products" className="inline-flex items-center text-sm font-body text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
+            Voltar para a loja
+          </Link>
+        </div>
+
         {/* Header Profile Summary (Mobile + Desktop) */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
