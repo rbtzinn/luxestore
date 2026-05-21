@@ -24,8 +24,8 @@ export default function Cart() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center max-w-md w-full px-6 py-12 rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm shadow-premium-sm">
           <ShoppingBag className="w-16 h-16 text-muted-foreground/30 mx-auto mb-6" />
           <h1 className="text-3xl font-display font-bold text-foreground mb-3">{t('cartPage.emptyTitle')}</h1>
           <p className="text-sm font-body text-muted-foreground mb-8">{t('cartPage.emptyDescription')}</p>

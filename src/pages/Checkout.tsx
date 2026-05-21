@@ -87,7 +87,10 @@ export default function Checkout() {
           <h1 className="text-3xl font-display font-bold text-foreground mb-3">{t('checkoutPage.confirmed')}</h1>
           <p className="text-sm font-body text-muted-foreground mb-2">{t('checkoutPage.orderNumber')} #ORD-{Date.now().toString().slice(-6)}</p>
           <p className="text-sm font-body text-muted-foreground mb-8">{t('checkoutPage.confirmationEmail')}</p>
-          <Link to="/products" className="btn-premium">{t('common.continueShopping')} <ArrowRight className="w-4 h-4" /></Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link to="/profile?tab=orders" className="btn-premium">Meus Pedidos <ArrowRight className="w-4 h-4" /></Link>
+            <Link to="/products" className="btn-premium-outline">{t('common.continueShopping')}</Link>
+          </div>
         </motion.div>
       </div>
     );

@@ -146,8 +146,8 @@ export default function Products() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t('productsPage.searchPlaceholder')} className="input-premium pl-10" />
           </div>
-          <div className="flex gap-3">
-            <button onClick={() => setShowFilters((current) => !current)} className="btn-premium-outline md:hidden">
+          <div className="grid grid-cols-2 md:flex gap-3 w-full md:w-auto">
+            <button onClick={() => setShowFilters((current) => !current)} className="btn-premium-outline md:hidden w-full">
               <SlidersHorizontal className="w-4 h-4" />
               {t('common.filters')}
             </button>
@@ -155,7 +155,7 @@ export default function Products() {
               value={sortBy}
               onValueChange={setSortBy}
               options={sortOptions.map((option) => ({ value: option, label: sortLabels[option] }))}
-              className="min-w-[180px]"
+              className="w-full md:min-w-[180px]"
             />
           </div>
         </div>
