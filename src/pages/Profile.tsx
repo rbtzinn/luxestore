@@ -135,14 +135,14 @@ export default function Profile() {
             spellCheck={false}
           />
         </div>
-        <div className="rounded-xl border border-border/70 bg-background/50 p-4 md:col-span-2 flex items-center justify-between">
-          <div>
+        <div className="rounded-xl border border-border/70 bg-background/50 p-4 md:col-span-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 overflow-hidden">
+          <div className="min-w-0 w-full">
             <p className="text-xs font-body uppercase tracking-[0.2em] text-muted-foreground">Email</p>
-            <p className="mt-1 text-sm font-body font-medium text-foreground">
+            <p className="mt-1 text-sm font-body font-medium text-foreground truncate">
               {user?.email || profile?.email || 'Não informado'}
             </p>
           </div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background px-3 py-1.5 text-xs font-body text-foreground">
+          <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background px-3 py-1.5 text-xs font-body text-foreground shrink-0">
             <ShieldCheck className="h-3.5 w-3.5" />
             {isAdmin ? 'Admin' : 'Cliente'}
           </div>
